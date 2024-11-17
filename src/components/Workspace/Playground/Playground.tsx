@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PreferenceNav from "./PreferenceNav/PreferenceNav";
 import Split from "react-split";
 import CodeMirror from "@uiw/react-codemirror";
@@ -7,31 +7,57 @@ import { javascript } from "@codemirror/lang-javascript";
 import { python } from "@codemirror/lang-python";
 import EditorFooter from "./EditorFooter";
 import { Problem } from "@/utils/types/problem";
+
+import { userCodeState } from "@/atoms/useCodeAtom";
+import { useRecoilState } from "recoil";
+
 type PlaygroundProps = {
   problem: Problem;
 };
 
 const Playground: React.FC<PlaygroundProps> = ({ problem }) => {
-  const [activeTestCaseId, setActiveTestCaseId] = useState<number>(0);
+  // const [activeTestCaseId, setActiveTestCaseId] = useState<number>(0);
+  // const [userCode, setUserCode] = useState<string>(problem.starterCode);
+  const [userCodeModal, setUserCode] = useRecoilState(userCodeState);
+
+  const handleCodeChange = (newCode: string) => {
+    localStorage.setItem("coding-editor", userCodeModal.userCode);
+    setUserCode((prev) => ({ ...prev, userCode: newCode }));
+  };
+
+  // useEffect(() => {
+  //   console.log(userCodeModal.userCode);
+  // }, [userCodeModal]);
+
+  useEffect(() => {
+    handleCodeChange(problem.starterCode);
+  }, []);
+
+  // useEffect(() => {
+  //   console.log(userCodeModal.userCode);
+  //   localStorage.setItem("coding-editor", userCodeModal.userCode);
+  // }, [userCodeModal]);
+
   return (
     <div className="flex flex-col bg-dark-layer-1 relative overflow-x-hidden">
       <PreferenceNav />
-      <Split
+      {/* <Split
         className="h-[calc(100vh-94px)]"
         direction="vertical"
         sizes={[60, 40]}
         minSize={60}
-      >
-        <div className="w-full overflow-auto">
-          <CodeMirror
-            value={problem.starterCode}
-            theme={vscodeDark}
-            extensions={[javascript()]}
-            style={{ fontSize: 16 }}
-          />
-        </div>
-        <div className="w-full px-5 overflow-auto">
-          {/* test case heading */}
+      > */}
+      <div className="w-full overflow-auto">
+        <CodeMirror
+          value={userCodeModal.userCode}
+          theme={vscodeDark}
+          extensions={[javascript()]}
+          style={{ fontSize: 16 }}
+          onChange={handleCodeChange}
+        />
+      </div>
+      {/* test case heading */}
+      {/* <div className="w-full px-5 overflow-auto">
           <div className="flex h-10 items-center space-x-6">
             <div className="relative flex h-full flex-col justify-center cursor-pointer">
               <div className="text-sm font-medium leading-5 text-white">
@@ -46,6 +72,7 @@ const Playground: React.FC<PlaygroundProps> = ({ problem }) => {
                 <div
                   className="mr-2 items-start mt-2 text-white"
                   onClick={() => setActiveTestCaseId(index)}
+                  key={index}
                 >
                   <div className="flex flex-wrap items-center gap-y-4">
                     <div
@@ -71,8 +98,8 @@ const Playground: React.FC<PlaygroundProps> = ({ problem }) => {
               {problem.examples[activeTestCaseId].outputText}
             </div>
           </div>
-        </div>
-      </Split>
+        </div> */}
+      {/* </Split> */}
       <EditorFooter />
     </div>
   );

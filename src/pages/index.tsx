@@ -53,51 +53,6 @@ export default function Home() {
             <ProblemTable />
           </table>
         </div>
-        <form className="p-6 flex flex-col max-w-dm gap-3">
-          <input
-            onChange={handleInputChange}
-            type="text"
-            placeholder="problem id"
-            name="id"
-          />
-          <input
-            onChange={handleInputChange}
-            type="text"
-            placeholder="title"
-            name="title"
-          />
-          <input
-            onChange={handleInputChange}
-            type="text"
-            placeholder="difficulty"
-            name="difficulty"
-          />
-          <input
-            onChange={handleInputChange}
-            type="text"
-            placeholder="category"
-            name="category"
-          />
-          <input
-            onChange={handleInputChange}
-            type="text"
-            placeholder="videoId"
-            name="videoId"
-          />
-          <input
-            onChange={handleInputChange}
-            type="text"
-            placeholder="link?"
-            name="link"
-          />
-          <input
-            onChange={handleInputChange}
-            type="text"
-            placeholder="order"
-            name="order"
-          />
-          <button className="bg-white">Save to Firestore</button>
-        </form>
       </main>
     </>
   );
