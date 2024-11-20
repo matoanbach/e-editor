@@ -10,11 +10,13 @@
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.2",
+    "@codemirror/lang-markdown": "^6.3.1",
     "@codemirror/lang-python": "^6.1.6",
     "@openai/realtime-api-beta": "github:openai/openai-realtime-api-beta",
     "@uiw/codemirror-theme-vscode": "^4.23.6",
     "@uiw/react-codemirror": "^4.23.6",
     "assert": "^2.1.0",
+    "codemirror": "github:codemirror/basic-setup",
     "dotenv": "^16.4.5",
     "firebase": "^11.0.1",
     "next": "15.0.3",

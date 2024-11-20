@@ -41,13 +41,13 @@ const Playground: React.FC<PlaygroundProps> = ({ problem }) => {
   return (
     <div className="flex flex-col bg-dark-layer-1 relative overflow-x-hidden">
       <PreferenceNav />
-      {/* <Split
+      <Split
         className="h-[calc(100vh-94px)]"
         direction="vertical"
         sizes={[60, 40]}
         minSize={60}
-      > */}
-      <div className="w-full overflow-auto">
+      >
+      <div className="w-full">
         <CodeMirror
           value={userCodeModal.userCode}
           theme={vscodeDark}
@@ -99,8 +99,8 @@ const Playground: React.FC<PlaygroundProps> = ({ problem }) => {
             </div>
           </div>
         </div> */}
-      {/* </Split> */}
-      <EditorFooter />
+      </Split>
+      {/* <EditorFooter /> */}
     </div>
   );
 };
