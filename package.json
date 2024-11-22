@@ -9,10 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@codemirror/lang-html": "^6.4.9",
     "@codemirror/lang-javascript": "^6.2.2",
     "@codemirror/lang-markdown": "^6.3.1",
     "@codemirror/lang-python": "^6.1.6",
     "@openai/realtime-api-beta": "github:openai/openai-realtime-api-beta",
+    "@uidotdev/usehooks": "^2.4.1",
     "@uiw/codemirror-theme-vscode": "^4.23.6",
     "@uiw/react-codemirror": "^4.23.6",
     "assert": "^2.1.0",
@@ -22,6 +24,7 @@
     "next": "15.0.3",
     "openai": "^4.72.0",
     "react": "^18.3.1",
+    "react-confetti": "^6.1.0",
     "react-dom": "^18.3.1",
     "react-feather": "^2.0.10",
     "react-firebase-hooks": "^5.1.1",

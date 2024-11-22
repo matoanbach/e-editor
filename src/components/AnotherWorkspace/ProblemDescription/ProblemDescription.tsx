@@ -1,22 +1,56 @@
+// import CircleSkeleton from "@/components/Skeletons/CircleSkeleton";
+// import RectangleSkeleton from "@/components/Skeletons/RectangleSkeleton";
 import { Problem } from "@/utils/types/problem";
 import CodeMirror from "@uiw/react-codemirror";
 import PreferenceNav from "../Playground/PreferenceNav/PreferenceNav";
 import Split from "react-split";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
-import EditorFooter from "../Playground/EditorFooter";
 import { html } from "@codemirror/lang-html";
 import { EditorView } from "@codemirror/view";
-
-
+import EditorFooter from "@/components/Workspace/Playground/EditorFooter";
+import { useState } from "react";
+import { ISettings } from "../Workspace";
 
 type ProblemDescriptionProps = {
   problem: Problem;
+  _solved: boolean;
+  settings: ISettings;
 };
 
-const ProblemDescription: React.FC<ProblemDescriptionProps> = ({ problem }) => {
+const ProblemDescription: React.FC<ProblemDescriptionProps> = ({
+  problem,
+  _solved,
+  settings,
+}) => {
+  // Create a custom theme
+  const customTheme = EditorView.theme(
+    {
+      "&": {
+        color: "#ff6347", // Tomato color for text
+        backgroundColor: "#282c34", // Dark background
+      },
+      ".cm-content": {
+        caretColor: "#ff6347", // Custom caret color
+      },
+      ".cm-line": {
+        color: settings.textColor, // Text color for each line
+      },
+    },
+    { dark: true }
+  ); // Set to dark mode if applicable
+  
   return (
     <div className="flex flex-col bg-dark-layer-1 relative overflow-x-hidden">
-      <PreferenceNav />
+      {/* <PreferenceNav /> */}
+      <div className="flex h-11 w-full items-center pt-2 bg-dark-layer-2 text-white overflow-x-hidden">
+        <div
+          className={
+            "bg-dark-layer-1 rounded-t-[5px] px-5 py-[10px] text-xs cursor-pointer"
+          }
+        >
+          Description
+        </div>
+      </div>
 
       <Split
         className="h-[calc(100vh-94px)]"
@@ -27,10 +61,13 @@ const ProblemDescription: React.FC<ProblemDescriptionProps> = ({ problem }) => {
         <div className="w-full overflow-auto">
           <CodeMirror
             className="cm-outer-container"
-            extensions={[html(), EditorView.lineWrapping]}
+            extensions={[customTheme]}
             value={""}
             theme={vscodeDark}
-            style={{ color: "red" }}
+            style={{
+              fontSize: settings.textFontSize,
+              font: "'JetBrains Mono', monospace",
+            }}
           />
         </div>
         <div className="w-full px-5 overflow-auto">
@@ -50,7 +87,7 @@ const ProblemDescription: React.FC<ProblemDescriptionProps> = ({ problem }) => {
                 <div className="flex flex-wrap items-center gap-y-4">
                   <div
                     className={`font-medium items-center transition-all focus:outline-none inline-flex bg-dark-fill-3 hover:bg-dark-fill-2 relative rounded-lg px-4 py-1 cursor-pointer whitespace-nowrap text-red-50
-									`}
+									  `}
                   >
                     Case {index + 1}
                   </div>

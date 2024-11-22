@@ -1,6 +1,6 @@
 import Topbar from "@/components/Topbar/Topbar";
 import Workspace from "@/components/Workspace/Workspace";
-
+import AnotherWorkspace from "@/components/AnotherWorkspace/Workspace";
 import { problems } from "@/utils/problems";
 import { Problem } from "@/utils/types/problem";
 
@@ -15,7 +15,8 @@ const ProblemPage: React.FC<ProblemPageProps> = ({ problem }) => {
     <>
       <div>
         <Topbar problemPage={true} />
-        <Workspace problem={problem}/>
+        {/* <Workspace problem={problem}/> */}
+        <AnotherWorkspace problem={problem}/>
       </div>
     </>
   );

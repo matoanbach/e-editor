@@ -4,7 +4,7 @@ import ProblemDescription from "./ProblemDescription/ProblemDescription";
 import Playground from "./Playground/Playground";
 import { Problem } from "@/utils/types/problem";
 import { useRecoilState } from "recoil";
-import { userCodeState } from "@/atoms/useCodeAtom";
+import { userCodeState } from "@/atoms/userCodeAtom";
 
 type WorkspaceProps = {
   problem: Problem;

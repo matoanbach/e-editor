@@ -6,7 +6,7 @@ import TemporaryToggle from "../TemporaryToggle/TemporaryToggle";
 import TemporaryButton from "../TemporaryButton/TemporaryButton";
 import APIRequestForm from "../APIRequestForm/APIRequestForm";
 import OpenAI from "openai";
-import { userCodeState } from "@/atoms/useCodeAtom";
+import { userCodeState } from "@/atoms/userCodeAtom";
 import { snapshot_UNSTABLE, useRecoilState, useRecoilValue } from "recoil";
 
 type VoicePageProps = {};
