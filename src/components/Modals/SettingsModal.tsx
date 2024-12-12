@@ -55,11 +55,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("e.target.name: ", e.target.name, "e.target.value: ", e.target.value)
     setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-	e.preventDefault();
-	setSettings({...settings, textColor: inputs.textColor})
+    e.preventDefault();
+    console.log(inputs)
+    setSettings({ ...settings, textColor: inputs.textColor })
   }
   return (
     <div className="text-white z-40">
@@ -205,6 +208,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                       <input
                         type="text"
                         id="textColor"
+                        name="textColor"
                         className="flex cursor-pointer items-center rounded px-3 py-1.5 text-left focus:outline-none whitespace-nowrap bg bg-dark-fill-3 hover:bg-dark-fill-2 active:bg-dark-fill-3 w-full justify-between"
                         onChange={handleChange}
                       />
@@ -235,17 +239,15 @@ const SettingsListItem: React.FC<SettingsListItemProps> = ({
   return (
     <li className="relative flex h-8 cursor-pointer select-none py-1.5 pl-2 text-label-2 dark:text-dark-label-2 hover:bg-dark-fill-3 rounded-lg">
       <div
-        className={`flex h-5 flex-1 items-center pr-2 ${
-          selectedOption === fontSize ? "font-medium" : ""
-        }`}
+        className={`flex h-5 flex-1 items-center pr-2 ${selectedOption === fontSize ? "font-medium" : ""
+          }`}
         onClick={() => handleFontSizeChange(fontSize)}
       >
         <div className="whitespace-nowrap">{fontSize}</div>
       </div>
       <span
-        className={`text-blue dark:text-dark-blue flex items-center pr-2 ${
-          selectedOption === fontSize ? "visible" : "invisible"
-        }`}
+        className={`text-blue dark:text-dark-blue flex items-center pr-2 ${selectedOption === fontSize ? "visible" : "invisible"
+          }`}
       >
         <BsCheckLg />
       </span>

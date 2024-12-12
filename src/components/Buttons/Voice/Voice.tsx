@@ -7,7 +7,7 @@ import TemporaryButton from "../TemporaryButton/TemporaryButton";
 import APIRequestForm from "../APIRequestForm/APIRequestForm";
 import OpenAI from "openai";
 import { userCodeState } from "@/atoms/userCodeAtom";
-import { useRecoilState } from "recoil";
+import { useGetRecoilValueInfo_UNSTABLE, useRecoilState } from "recoil";
 
 type VoicePageProps = {};
 
@@ -78,7 +78,6 @@ Additional Notes:
 - Be open to experimentation and create a collaborative environment where users feel comfortable exploring, asking questions, and modifying content.
 - Foster seamless integration between your assistance and the user’s workflow, ensuring minimal disruption and maximum utility.
 `;
-
 
 /**
  * Type for all event logs
@@ -320,7 +319,6 @@ const VoicePage: React.FC<VoicePageProps> = () => {
       },
       async () => {
         const code = localStorage.getItem("coding-editor");
-        console.log("chatgpt request: ", code);
         if (!code) {
           return "No code found in the editor.";
         }
@@ -360,14 +358,45 @@ const VoicePage: React.FC<VoicePageProps> = () => {
               description:
                 "The new code to replace the current code in the editor",
             },
+            fromLine: {
+              type: "number",
+              description: "The starting line for the new code",
+            },
+            toLine: {
+              type: "number",
+              description: "The ending line for the new code",
+            },
           },
-          required: ["newCode"],
+          required: ["newCode", "fromLine", "toLine"],
         },
       },
-      async ({ newCode }: { newCode: string }) => {
+      async ({
+        newCode,
+        fromLine,
+        toLine,
+      }: {
+        newCode: string;
+        fromLine: number;
+        toLine: number;
+      }) => {
         if (!newCode) {
           return "Failed to update code: No new code provided.";
         }
+        // let oldCode = localStorage.getItem("coding-editor");
+        // if (!oldCode) {
+        //   return "Failed to update code: No old code provided.";
+        // }
+
+        // let tmp = [
+        //   // part of the array before the specified index
+        //   ...oldCode.slice(0, fromLine),
+        //   // inserted items
+        //   ...newCode,
+        //   // part of the array after the specified index
+        //   ...oldCode.slice(fromLine),
+        // ];
+
+        console.log(newCode);
         setUserCode((prev) => ({
           ...prev,
           codeEditor: { ...prev.codeEditor, content: newCode },
@@ -413,7 +442,8 @@ const VoicePage: React.FC<VoicePageProps> = () => {
     client.addTool(
       {
         name: "highlight",
-        description: "Highlight a specified range of lines in the given editor.",
+        description:
+          "Highlight a specified range of lines in the given editor.",
         parameters: {
           type: "object",
           properties: {
@@ -439,12 +469,12 @@ const VoicePage: React.FC<VoicePageProps> = () => {
           required: ["editorType", "enabledHighlight", "fromLine", "toLine"],
         },
       },
-      
+
       async ({
         editorType,
         fromLine,
         toLine,
-        enabledHighlight, 
+        enabledHighlight,
       }: {
         editorType: string;
         fromLine: number;

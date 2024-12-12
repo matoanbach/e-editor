@@ -54,6 +54,7 @@ const ProblemDescription: React.FC<ProblemDescriptionProps> = ({
       },
       ".cm-line": {
         color: settings.textColor, // Text color for each line
+        // color: "#ff6347"
       },
     },
     { dark: true }
@@ -83,9 +84,12 @@ const ProblemDescription: React.FC<ProblemDescriptionProps> = ({
     }
   }, [userCodeModal.descriptionEditor.highlightDescription]);
 
+  useEffect(() => {
+    console.log(settings.textColor)
+  }, [settings.textColor])
+
   return (
     <div className="flex flex-col bg-dark-layer-1 relative overflow-x-hidden">
-      {/* <PreferenceNav /> */}
       <div className="flex h-11 w-full items-center pt-2 bg-dark-layer-2 text-white overflow-x-hidden">
         <div
           className={
