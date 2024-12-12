@@ -48,6 +48,18 @@ Tool Usage:
    - Confirm the update by notifying the user that the description has been successfully updated.
    - If the update fails, provide a clear and actionable error message.
 
+5. **highlight**:
+   - Use this tool to enable or disable highlighting for a specified range of lines in a given editor.
+   - Parameters:
+     - editorType (string): The type of the editor in which to apply the highlighting. Must be either 'description-editor' or 'coding-editor'.
+     - enabledHighlight (boolean): A boolean flag indicating whether to enable (true) or disable (false) the highlighting effect.
+     - fromLine (number): The starting line number to highlight (inclusive).
+     - toLine (number): The ending line number to highlight (inclusive).
+   - Validate that editorType, enabledHighlight, fromLine, and toLine are provided.
+   - If enabledHighlight is true, highlight the specified range of lines. If false, remove any existing highlight.
+   - Confirm the action by notifying the user that the highlight has been successfully updated.
+   - If the operation fails, provide a clear and actionable error message.
+
 Behavior and Personality:
 - Maintain a friendly, courteous, and professional tone at all times.
 - Be proactive in assisting the user by monitoring and understanding the content of the editors.
@@ -66,6 +78,7 @@ Additional Notes:
 - Be open to experimentation and create a collaborative environment where users feel comfortable exploring, asking questions, and modifying content.
 - Foster seamless integration between your assistance and the user’s workflow, ensuring minimal disruption and maximum utility.
 `;
+
 
 /**
  * Type for all event logs
@@ -355,7 +368,11 @@ const VoicePage: React.FC<VoicePageProps> = () => {
         if (!newCode) {
           return "Failed to update code: No new code provided.";
         }
-        setUserCode((prev) => ({ ...prev, codeEditor: newCode })); // Update code state
+        setUserCode((prev) => ({
+          ...prev,
+          codeEditor: { ...prev.codeEditor, content: newCode },
+        }));
+        // Update code state
         return "Code successfully updated in the editor.";
       }
     );
@@ -381,8 +398,90 @@ const VoicePage: React.FC<VoicePageProps> = () => {
         if (!newDescription) {
           return "Failed to update description: No new description provided.";
         }
-        setUserCode((prev) => ({ ...prev, descriptionEditor: newDescription })); // Update description state
+        setUserCode((prev) => ({
+          ...prev,
+          descriptionEditor: {
+            ...prev.descriptionEditor,
+            content: newDescription,
+          },
+        })); // Update description state
         return "Description successfully updated in the editor.";
+      }
+    );
+
+    // Tool to update the problem description in the editor
+    client.addTool(
+      {
+        name: "highlight",
+        description: "Highlight a specified range of lines in the given editor.",
+        parameters: {
+          type: "object",
+          properties: {
+            editorType: {
+              type: "string",
+              description:
+                "The type of editor in which to apply the highlighting. Must be either 'description-editor' or 'coding-editor'.",
+            },
+            enabledHighlight: {
+              type: "boolean",
+              description:
+                "A boolean flag indicating whether to enable or disable the highlighting effect. Set to 'true' to turn on highlighting for the specified range, or 'false' to remove any existing highlights.",
+            },
+            fromLine: {
+              type: "number",
+              description: "The starting line number to highlight (inclusive).",
+            },
+            toLine: {
+              type: "number",
+              description: "The ending line number to highlight (inclusive).",
+            },
+          },
+          required: ["editorType", "enabledHighlight", "fromLine", "toLine"],
+        },
+      },
+      
+      async ({
+        editorType,
+        fromLine,
+        toLine,
+        enabledHighlight, 
+      }: {
+        editorType: string;
+        fromLine: number;
+        toLine: number;
+        enabledHighlight: boolean;
+      }) => {
+        if (!editorType) {
+          return "Failed to highlight.";
+        }
+        if (editorType === "coding-editor") {
+          setUserCode((prev) => ({
+            ...prev,
+            codeEditor: {
+              ...prev.codeEditor,
+              highlightCode: {
+                ...prev.codeEditor.highlightCode,
+                enabled: enabledHighlight,
+                from: fromLine,
+                to: toLine,
+              }, // or just use from/to directly
+            },
+          }));
+        } else {
+          setUserCode((prev) => ({
+            ...prev,
+            descriptionEditor: {
+              ...prev.descriptionEditor,
+              highlightDescription: {
+                ...prev.descriptionEditor.highlightDescription,
+                enabled: enabledHighlight,
+                from: fromLine,
+                to: toLine,
+              }, // or just use from/to directly
+            },
+          }));
+        }
+        return "Successfully highlighted.";
       }
     );
 
@@ -434,15 +533,13 @@ const VoicePage: React.FC<VoicePageProps> = () => {
     };
   };
 
-  useEffect(() => {
-    const code = localStorage.getItem("coding-editor");
-    console.log("current:", code);
-  }, [userCodeModal.codeEditor]);
+  // useEffect(() => {
+  //   console.log(userCodeModal.codeEditor)
+  // }, [userCodeModal.codeEditor]);
 
-  useEffect(() => {
-    const code = localStorage.getItem("description-editor");
-    console.log(code);
-  }, [userCodeModal.descriptionEditor]);
+  // useEffect(() => {
+  //   console.log(userCodeModal.descriptionEditor)
+  // }, [userCodeModal.descriptionEditor]);
 
   return (
     <div className="flex items-center gap-4">

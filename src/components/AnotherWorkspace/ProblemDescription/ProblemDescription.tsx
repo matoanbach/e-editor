@@ -8,10 +8,15 @@ import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import { html } from "@codemirror/lang-html";
 import { EditorView } from "@codemirror/view";
 import EditorFooter from "@/components/Workspace/Playground/EditorFooter";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ISettings } from "../Workspace";
 import { useRecoilState } from "recoil";
 import { userCodeState } from "@/atoms/userCodeAtom";
+import {
+  addLineHighlightRange,
+  clearLineHighlight,
+  lineHighlightField,
+} from "@/utils/temp/highlightLines";
 
 type ProblemDescriptionProps = {
   problem: Problem;
@@ -24,19 +29,20 @@ const ProblemDescription: React.FC<ProblemDescriptionProps> = ({
   _solved,
   settings,
 }) => {
-
+  const editorViewRef = useRef<EditorView | null>(null);
   const [userCodeModal, setUserCode] = useRecoilState(userCodeState);
 
   const handleDescriptionChange = (newDescription: string) => {
-    localStorage.setItem("description-editor", userCodeModal.descriptionEditor);
-    setUserCode((prev) => ({ ...prev, descriptionEditor: newDescription }));
+    setUserCode((prev) => ({
+      ...prev,
+      descriptionEditor: { ...prev.descriptionEditor, content: newDescription },
+    }));
+    localStorage.setItem(
+      "description-editor",
+      userCodeModal.descriptionEditor.content
+    );
   };
 
-  // useEffect(() => {
-  //   handleCodeChange(problem.starterCode);
-  // }, []);
-
-  // Create a custom theme
   const customTheme = EditorView.theme(
     {
       "&": {
@@ -52,7 +58,31 @@ const ProblemDescription: React.FC<ProblemDescriptionProps> = ({
     },
     { dark: true }
   ); // Set to dark mode if applicable
-  
+
+  // Highlight a range of lines, e.g. from line 1 to 4
+  const highlightLines = (start: number, end: number) => {
+    const view = editorViewRef.current;
+    if (!view) return;
+    if (userCodeModal.descriptionEditor.highlightDescription.enabled) {
+      view.dispatch({
+        effects: addLineHighlightRange.of({ fromLine: start, toLine: end }),
+      });
+    } else {
+      view.dispatch({
+        effects: clearLineHighlight.of(undefined),
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (editorViewRef.current) {
+      highlightLines(
+        userCodeModal.descriptionEditor.highlightDescription.from,
+        userCodeModal.descriptionEditor.highlightDescription.to
+      );
+    }
+  }, [userCodeModal.descriptionEditor.highlightDescription]);
+
   return (
     <div className="flex flex-col bg-dark-layer-1 relative overflow-x-hidden">
       {/* <PreferenceNav /> */}
@@ -74,14 +104,17 @@ const ProblemDescription: React.FC<ProblemDescriptionProps> = ({
       >
         <div className="w-full overflow-auto">
           <CodeMirror
-            value={userCodeModal.descriptionEditor}
+            value={userCodeModal.descriptionEditor.content}
             className="cm-outer-container"
-            extensions={[customTheme]}
+            extensions={[customTheme, lineHighlightField]}
             onChange={handleDescriptionChange}
             theme={vscodeDark}
             style={{
               fontSize: settings.textFontSize,
               font: "'JetBrains Mono', monospace",
+            }}
+            onCreateEditor={(view) => {
+              editorViewRef.current = view;
             }}
           />
         </div>
