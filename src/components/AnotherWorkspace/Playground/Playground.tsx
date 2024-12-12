@@ -2,11 +2,17 @@ import { useState, useEffect } from "react";
 import PreferenceNav from "./PreferenceNav/PreferenceNav";
 import CodeMirror from "@uiw/react-codemirror";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
-import { javascript } from "@codemirror/lang-javascript";
 import { Problem } from "@/utils/types/problem";
 import { auth, firestore } from "@/firebase/firebase";
 import { doc, updateDoc } from "firebase/firestore";
 import { ISettings } from "../Workspace";
+import { useRecoilState } from "recoil";
+import { userCodeState } from "@/atoms/userCodeAtom";
+
+// Programming languages for the code editor:
+import { python } from "@codemirror/lang-python";
+import { javascript } from "@codemirror/lang-javascript";
+
 
 type PlaygroundProps = {
   problem: Problem;
@@ -23,33 +29,47 @@ const Playground: React.FC<PlaygroundProps> = ({
   settings,
   setSettings,
 }) => {
-  const [userCode, setUserCode] = useState<string>(problem.starterCode || "");
+  // const [userCode, setUserCode] = useState<string>(problem.starterCode || "");
+  const [userCodeModal, setUserCode] = useRecoilState(userCodeState);
+
+  // useEffect(() => {
+  //   const problemKey = `coding-editor-${problem.id}`;
+  //   const savedCode = localStorage.getItem(problemKey);
+  //   if (savedCode) {
+  //     setUserCode(JSON.parse(savedCode));
+  //   }
+  // }, [problem.id]);
+
+  // const onChange = (value: string) => {
+  //   setUserCode(value);
+  //   const problemKey = `coding-editor-${problem.id}`;
+  //   localStorage.setItem(problemKey, JSON.stringify(value));
+
+  //   // // Optional: Update Firebase
+  //   // clearTimeout(window.saveToFirebase);
+  //   // window.saveToFirebase = setTimeout(async () => {
+  //   //   const user = auth.currentUser;
+  //   //   if (!user) return;
+
+  //   //   const userDoc = doc(firestore, "users", user.uid);
+  //   //   await updateDoc(userDoc, {
+  //   //     [`problems.${problem.id}.code`]: value,
+  //   //   });
+  //   // }, 1000);
+  // };
+
+  const handleCodeChange = (newCode: string) => {
+    setUserCode((prev) => ({ ...prev, codeEditor: newCode }));
+    localStorage.setItem("coding-editor", userCodeModal.codeEditor);
+  };
 
   useEffect(() => {
-    const problemKey = `coding-editor-${problem.id}`;
-    const savedCode = localStorage.getItem(problemKey);
-    if (savedCode) {
-      setUserCode(JSON.parse(savedCode));
-    }
-  }, [problem.id]);
+    handleCodeChange(problem.starterCode);
+  }, []);
 
-  const onChange = (value: string) => {
-    setUserCode(value);
-    const problemKey = `coding-editor-${problem.id}`;
-    localStorage.setItem(problemKey, JSON.stringify(value));
-
-    // // Optional: Update Firebase
-    // clearTimeout(window.saveToFirebase);
-    // window.saveToFirebase = setTimeout(async () => {
-    //   const user = auth.currentUser;
-    //   if (!user) return;
-
-    //   const userDoc = doc(firestore, "users", user.uid);
-    //   await updateDoc(userDoc, {
-    //     [`problems.${problem.id}.code`]: value,
-    //   });
-    // }, 1000);
-  };
+  // useEffect(() => {
+  //   console.log("initial 2: ", userCodeModal.codeEditor);
+  // }, [userCodeModal.codeEditor]);
 
   return (
     <div className="flex flex-col bg-dark-layer-1 relative overflow-x-hidden">
@@ -57,10 +77,10 @@ const Playground: React.FC<PlaygroundProps> = ({
       <div className="h-[calc(100vh-94px)] overflow-y-auto">
         <div className="w-full overflow-auto">
           <CodeMirror
-            value={userCode}
+            value={userCodeModal.codeEditor}
             theme={vscodeDark}
-            onChange={onChange}
-            extensions={[javascript()]}
+            onChange={handleCodeChange}
+            extensions={[python()]}
             style={{ fontSize: settings.codeFontSize }}
           />
         </div>

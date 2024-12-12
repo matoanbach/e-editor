@@ -7,50 +7,65 @@ import TemporaryButton from "../TemporaryButton/TemporaryButton";
 import APIRequestForm from "../APIRequestForm/APIRequestForm";
 import OpenAI from "openai";
 import { userCodeState } from "@/atoms/userCodeAtom";
-import { snapshot_UNSTABLE, useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState } from "recoil";
 
 type VoicePageProps = {};
 
 const instructions = `
-System Settings:
+  System Settings:
 - Tool usage: enabled.
-- Access to code editor: enabled for reading and editing.
+- Access to the code editor: enabled for reading and editing.
+- Access to the problem description editor: enabled for reading and editing.
 
 Instructions:
-- You are an intelligent assistant tasked with helping the user interact with their code editor in real-time.
-- Your primary tasks include:
-  1. Reading the code in the editor using the "read_code" tool when requested.
-  2. Editing the code in the editor by replacing it with new code using the "change_code" tool when instructed.
+- You are an intelligent assistant designed to help the user interact with their code editor and problem description editor in real-time.
+- Your responsibilities include:
+  1. **Proactively monitoring** the code and description editors to stay updated on changes.
+  2. Fetching the current code or description upon user request.
+  3. Updating the code or description as instructed by the user, ensuring all updates are valid and accurately reflect the request.
+  4. Providing meaningful suggestions or explanations based on the current content in the editors.
 
 Tool Usage:
 1. **read_code**:
    - Use this tool to fetch and display the current content of the code editor.
-   - Ensure you present the code clearly, maintaining formatting for readability.
-   - Do not make assumptions about the code unless explicitly asked.
+   - Validate that the fetched code is the most recent version.
+   - If the code editor is empty, notify the user that no code is available.
 
-2. **change_code**:
+2. **read_description**:
+   - Use this tool to fetch and display the current problem description from the editor.
+   - Validate that the fetched description is the most recent version.
+   - If the description editor is empty, notify the user that no description is available.
+
+3. **change_code**:
    - Use this tool to replace the existing code in the editor with new code provided by the user or suggested by you.
-   - Ensure the new code is valid and relevant to the user’s request.
-   - Confirm the changes by informing the user that the code has been updated.
-   - If the new code is invalid or missing, provide an appropriate error message.
+   - Validate that the newCode parameter is not empty before attempting to update the editor.
+   - Confirm the update by notifying the user that the code has been successfully updated.
+   - If the update fails, provide a clear and actionable error message.
+
+4. **change_description**:
+   - Use this tool to replace the current problem description in the editor with a new description provided by the user or suggested by you.
+   - Validate that the newDescription parameter is not empty before attempting to update the editor.
+   - Confirm the update by notifying the user that the description has been successfully updated.
+   - If the update fails, provide a clear and actionable error message.
 
 Behavior and Personality:
-- Maintain a kind, courteous, and professional tone at all times.
-- Be proactive in assisting the user, offering suggestions or clarifications when necessary.
-- Use conversational language and adapt to the user's needs while ensuring your responses are concise and helpful.
-- Be collaborative, and explain your reasoning when suggesting edits or improvements to the code.
+- Maintain a friendly, courteous, and professional tone at all times.
+- Be proactive in assisting the user by monitoring and understanding the content of the editors.
+- Use concise and conversational language, adapting to the user's needs while ensuring your responses are helpful and accurate.
+- **Speak at a faster pace to maintain an engaging and dynamic interaction.** Avoid unnecessary pauses while delivering information clearly and quickly.
 
-Guidelines for Code Editing:
-- Only edit the code if explicitly requested by the user.
-- When suggesting changes, explain the reason behind the modification and how it improves the code.
-- Preserve the original intent and structure of the user's code unless a complete replacement is requested.
-- Ensure the user is informed of the changes and confirm that they are satisfied with the result.
+Guidelines for Code and Description Editing:
+- Proactively monitor the editors using the read_code and read_description tools, but avoid making changes unless explicitly requested by the user.
+- When suggesting changes, clearly explain the reasoning and how the new content improves the user’s solution or understanding.
+- Validate all updates made using the change_code or change_description tools to ensure they align with the user’s request and editor state.
+- Encourage user feedback on changes to ensure satisfaction and continued collaboration.
 
 Additional Notes:
-- Always validate that the new code provided to the "change_code" tool is not empty before attempting to update the editor.
-- Be open to experimentation and foster a collaborative environment where users feel comfortable exploring and modifying code.
+- Regularly validate that the read_code and read_description tools fetch the correct and most recent state of the editors.
+- Avoid making assumptions about the code or description unless explicitly requested by the user.
+- Be open to experimentation and create a collaborative environment where users feel comfortable exploring, asking questions, and modifying content.
+- Foster seamless integration between your assistance and the user’s workflow, ensuring minimal disruption and maximum utility.
 `;
-
 
 /**
  * Type for all event logs
@@ -280,34 +295,57 @@ const VoicePage: React.FC<VoicePageProps> = () => {
     // Set transcription, otherwise we don't get user transcriptions back
     client.updateSession({ input_audio_transcription: { model: "whisper-1" } });
 
-    // Explain code functionality
+    // Tool to read the code from the editor
     client.addTool(
       {
         name: "read_code",
-        description: "Read the code in the editor",
+        description: "Read the current code in the coding editor",
         parameters: {
           type: "object",
-          properties: {},
+          properties: {}, // No parameters required for this tool
         },
       },
       async () => {
         const code = localStorage.getItem("coding-editor");
+        console.log("chatgpt request: ", code);
+        if (!code) {
+          return "No code found in the editor.";
+        }
         return code;
       }
     );
-    // Change the code functionality
+
+    // Tool to read the problem description
+    client.addTool(
+      {
+        name: "read_description",
+        description: "Read the problem description from the description editor",
+        parameters: {
+          type: "object",
+          properties: {}, // No parameters required for this tool
+        },
+      },
+      async () => {
+        const description = localStorage.getItem("description-editor");
+        if (!description) {
+          return "No description found in the editor.";
+        }
+        return description;
+      }
+    );
+
+    // Tool to update the code in the editor
     client.addTool(
       {
         name: "change_code",
-        description:
-          "Change the code as needed by replacing it with a whole new code",
+        description: "Update the code in the editor with a new version",
         parameters: {
           type: "object",
           properties: {
             newCode: {
               type: "string",
               description:
-                "The new code to replace the existing code in the code editor",
+                "The new code to replace the current code in the editor",
             },
           },
           required: ["newCode"],
@@ -315,10 +353,36 @@ const VoicePage: React.FC<VoicePageProps> = () => {
       },
       async ({ newCode }: { newCode: string }) => {
         if (!newCode) {
-          return "Code unsuccessfully udpated in the code editor"
+          return "Failed to update code: No new code provided.";
         }
-        setUserCode((prev) => ({ ...prev, userCode: newCode })); // Replace the code in localStorage
-        return "Code successfully updated in localStorage.";
+        setUserCode((prev) => ({ ...prev, codeEditor: newCode })); // Update code state
+        return "Code successfully updated in the editor.";
+      }
+    );
+
+    // Tool to update the problem description in the editor
+    client.addTool(
+      {
+        name: "change_description",
+        description: "Update the problem description in the editor",
+        parameters: {
+          type: "object",
+          properties: {
+            newDescription: {
+              type: "string",
+              description:
+                "The new description to replace the current problem description in the editor",
+            },
+          },
+          required: ["newDescription"],
+        },
+      },
+      async ({ newDescription }: { newDescription: string }) => {
+        if (!newDescription) {
+          return "Failed to update description: No new description provided.";
+        }
+        setUserCode((prev) => ({ ...prev, descriptionEditor: newDescription })); // Update description state
+        return "Description successfully updated in the editor.";
       }
     );
 
@@ -371,9 +435,14 @@ const VoicePage: React.FC<VoicePageProps> = () => {
   };
 
   useEffect(() => {
-    const code = localStorage.getItem("coding-editor"); // Retrieve from localStorage
-    console.log(code)
-  }, [userCodeModal]);
+    const code = localStorage.getItem("coding-editor");
+    console.log("current:", code);
+  }, [userCodeModal.codeEditor]);
+
+  useEffect(() => {
+    const code = localStorage.getItem("description-editor");
+    console.log(code);
+  }, [userCodeModal.descriptionEditor]);
 
   return (
     <div className="flex items-center gap-4">

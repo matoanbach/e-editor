@@ -1,11 +1,13 @@
 import { atom } from "recoil";
 
 type UserCodeState = {
-    userCode: string
+    codeEditor: string;
+    descriptionEditor: string;
 }
 
 const initialUserCodeState : UserCodeState = {
-    userCode: ""
+    codeEditor: "",
+    descriptionEditor: "",
 }
 
 export const userCodeState = atom<UserCodeState>({

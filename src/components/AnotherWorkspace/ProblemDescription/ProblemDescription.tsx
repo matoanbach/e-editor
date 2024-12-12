@@ -8,8 +8,10 @@ import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import { html } from "@codemirror/lang-html";
 import { EditorView } from "@codemirror/view";
 import EditorFooter from "@/components/Workspace/Playground/EditorFooter";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ISettings } from "../Workspace";
+import { useRecoilState } from "recoil";
+import { userCodeState } from "@/atoms/userCodeAtom";
 
 type ProblemDescriptionProps = {
   problem: Problem;
@@ -22,6 +24,18 @@ const ProblemDescription: React.FC<ProblemDescriptionProps> = ({
   _solved,
   settings,
 }) => {
+
+  const [userCodeModal, setUserCode] = useRecoilState(userCodeState);
+
+  const handleDescriptionChange = (newDescription: string) => {
+    localStorage.setItem("description-editor", userCodeModal.descriptionEditor);
+    setUserCode((prev) => ({ ...prev, descriptionEditor: newDescription }));
+  };
+
+  // useEffect(() => {
+  //   handleCodeChange(problem.starterCode);
+  // }, []);
+
   // Create a custom theme
   const customTheme = EditorView.theme(
     {
@@ -60,9 +74,10 @@ const ProblemDescription: React.FC<ProblemDescriptionProps> = ({
       >
         <div className="w-full overflow-auto">
           <CodeMirror
+            value={userCodeModal.descriptionEditor}
             className="cm-outer-container"
             extensions={[customTheme]}
-            value={""}
+            onChange={handleDescriptionChange}
             theme={vscodeDark}
             style={{
               fontSize: settings.textFontSize,

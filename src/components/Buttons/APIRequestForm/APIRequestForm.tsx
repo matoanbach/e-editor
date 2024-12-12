@@ -9,7 +9,7 @@ type APIRequestFormProps = {
 const APIRequestForm: React.FC<APIRequestFormProps> = ({handleChange}) => {
   return (
     <div className="flex items-center gap-3">
-      <FaRegQuestionCircle/>
+      <FaRegQuestionCircle className="ml-3"/>
       <form className="flex items-center gap-3 text-nowrap">
         <label
           className="text-sm font-medium block text-gray-300"

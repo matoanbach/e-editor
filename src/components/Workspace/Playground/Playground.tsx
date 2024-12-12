@@ -20,7 +20,7 @@ const Playground: React.FC<PlaygroundProps> = ({ problem }) => {
   const [userCodeModal, setUserCode] = useRecoilState(userCodeState);
 
   const handleCodeChange = (newCode: string) => {
-    localStorage.setItem("coding-editor", userCodeModal.userCode);
+    localStorage.setItem("coding-editor", userCodeModal.codeEditor);
     setUserCode((prev) => ({ ...prev, userCode: newCode }));
   };
 
@@ -43,7 +43,7 @@ const Playground: React.FC<PlaygroundProps> = ({ problem }) => {
       <div className="h[calc(100vh-94px)] overflow-y-auto">
         <div className="w-full">
           <CodeMirror
-            value={userCodeModal.userCode}
+            value={userCodeModal.codeEditor}
             theme={vscodeDark}
             onChange={handleCodeChange}
             extensions={[javascript()]}
