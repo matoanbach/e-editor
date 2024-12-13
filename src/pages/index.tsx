@@ -1,5 +1,6 @@
 import ProblemTable from "@/components/ProblemTable/ProblemTable";
 import Topbar from "@/components/Topbar/Topbar";
+import Link from "next/link";
 import { useState } from "react";
 
 export default function Home() {
@@ -25,8 +26,10 @@ export default function Home() {
     <>
       <main className="bg-dark-layer-2 min-h-screen">
         <Topbar />
-
-        <h1 className="text-2xl text-center text-gray-700 dark:text-gray-400 font-medium uppercase mt-10 mb-5">
+        <Link href="/problems">
+          Practice
+        </Link>
+        {/* <h1 className="text-2xl text-center text-gray-700 dark:text-gray-400 font-medium uppercase mt-10 mb-5">
           &ldquo; QUALITY OVER QUANTITY &rdquo;
         </h1>
         <div className="relative overflow-x-auto mx-auto px-6 pb-10">
@@ -52,7 +55,7 @@ export default function Home() {
             </thead>
             <ProblemTable />
           </table>
-        </div>
+        </div> */}
       </main>
     </>
   );

@@ -9,7 +9,7 @@ type indexProps = {
 };
 
 const index: React.FC<indexProps> = () => {
-    const count = useSelector((state: RootState) => state.counter.value)
+    const count = useSelector((state: RootState) => state.counterSlice.value)
     const dispatch = useDispatch<AppDispatch>();
 
     return <div>

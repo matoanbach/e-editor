@@ -2,12 +2,12 @@ import { useState } from "react";
 import Split from "react-split";
 import ProblemDescription from "./ProblemDescription/ProblemDescription";
 import Playground from "./Playground/Playground";
-import { Problem } from "@/utils/types/problem";
 import Confetti from "react-confetti";
+import { ProblemType } from "@/utils/types/problemType";
 // import useWindowSize from "@/hooks/useWindowSize";
 
 type WorkspaceProps = {
-  problem: Problem;
+  problem: ProblemType;
 };
 
 export interface ISettings {
@@ -20,9 +20,6 @@ export interface ISettings {
 }
 
 const Workspace: React.FC<WorkspaceProps> = ({ problem }) => {
-  // const { width, height } = useWindowSize();
-  const [success, setSuccess] = useState(false);
-  const [solved, setSolved] = useState(false);
 
   const [settings, setSettings] = useState<ISettings>({
     codeFontSize: "14px",
@@ -35,12 +32,10 @@ const Workspace: React.FC<WorkspaceProps> = ({ problem }) => {
 
   return (
     <Split className="split" minSize={0}>
-      <ProblemDescription problem={problem} _solved={solved} settings={settings} />
+      <ProblemDescription problem={problem} settings={settings} />
       <div className="bg-dark-fill-2">
         <Playground
           problem={problem}
-          setSuccess={setSuccess}
-          setSolved={setSolved}
           settings={settings}
           setSettings={setSettings}
         />
