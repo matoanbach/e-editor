@@ -1,7 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useState } from "react";
 import { RiVoiceprintLine } from "react-icons/ri";
-import { FaRegQuestionCircle } from "react-icons/fa";
-import { VscNewline } from "react-icons/vsc";
 import OpenAI from "openai";
 import Voice from "../Voice/Voice";
 
@@ -9,13 +7,6 @@ type VoiceAssistantProps = {};
 
 const VoiceAssistant: React.FC<VoiceAssistantProps> = () => {
   const [showForm, setShowForm] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [inputs, setApiKey] = useState({ apikey: "" });
-  const [validAPIKey, setValidAPIKey] = useState<boolean>(false);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setApiKey((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
 
   return (
     <div className="preferenceBtn group p-0 mr-0">

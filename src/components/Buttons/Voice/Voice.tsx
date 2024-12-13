@@ -2,12 +2,15 @@ import React, { useEffect, useRef, useCallback, useState } from "react";
 import { WavRecorder, WavStreamPlayer } from "@/lib/wavtools/index.js";
 import { RealtimeClient } from "@openai/realtime-api-beta";
 import { ItemType } from "@openai/realtime-api-beta/dist/lib/client.js";
-import TemporaryToggle from "../TemporaryToggle/TemporaryToggle";
-import TemporaryButton from "../TemporaryButton/TemporaryButton";
-import APIRequestForm from "../APIRequestForm/APIRequestForm";
 import OpenAI from "openai";
 import { userCodeState } from "@/atoms/userCodeAtom";
-import { useGetRecoilValueInfo_UNSTABLE, useRecoilState } from "recoil";
+import { useRecoilState } from "recoil";
+import TemporaryToggle from "@/components/Buttons/TemporaryToggle/TemporaryToggle";
+import TemporaryButton from "@/components/Buttons/TemporaryButton/TemporaryButton";
+import APIRequestForm from "@/components/Buttons/APIRequestForm/APIRequestForm";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/state/store";
+import { setCodeContent, setDescriptionContent, setHighlighCode, setHighlighDecription } from "@/state/editor/editorSlice";
 
 type VoicePageProps = {};
 
@@ -98,8 +101,8 @@ const VoicePage: React.FC<VoicePageProps> = () => {
   );
   const clientRef = useRef<RealtimeClient | null>(null);
 
-  const [userCodeModal, setUserCode] = useRecoilState(userCodeState);
-
+  const { codeEditor, descriptionEditor, problem } = useSelector((state: RootState) => state.editorSlice)
+  const dispatch = useDispatch<AppDispatch>()
   /**
    * References for
    * - Rendering audio visualization (canvas)
@@ -397,10 +400,11 @@ const VoicePage: React.FC<VoicePageProps> = () => {
         // ];
 
         console.log(newCode);
-        setUserCode((prev) => ({
-          ...prev,
-          codeEditor: { ...prev.codeEditor, content: newCode },
-        }));
+        dispatch(setCodeContent(newCode))
+        // setUserCode((prev) => ({
+        //   ...prev,
+        //   codeEditor: { ...prev.codeEditor, content: newCode },
+        // }));
         // Update code state
         return "Code successfully updated in the editor.";
       }
@@ -427,13 +431,14 @@ const VoicePage: React.FC<VoicePageProps> = () => {
         if (!newDescription) {
           return "Failed to update description: No new description provided.";
         }
-        setUserCode((prev) => ({
-          ...prev,
-          descriptionEditor: {
-            ...prev.descriptionEditor,
-            content: newDescription,
-          },
-        })); // Update description state
+        dispatch(setDescriptionContent(newDescription));
+        // setUserCode((prev) => ({
+        //   ...prev,
+        //   descriptionEditor: {
+        //     ...prev.descriptionEditor,
+        //     content: newDescription,
+        //   },
+        // })); // Update description state
         return "Description successfully updated in the editor.";
       }
     );
@@ -485,31 +490,41 @@ const VoicePage: React.FC<VoicePageProps> = () => {
           return "Failed to highlight.";
         }
         if (editorType === "coding-editor") {
-          setUserCode((prev) => ({
-            ...prev,
-            codeEditor: {
-              ...prev.codeEditor,
-              highlightCode: {
-                ...prev.codeEditor.highlightCode,
-                enabled: enabledHighlight,
-                from: fromLine,
-                to: toLine,
-              }, // or just use from/to directly
-            },
-          }));
+          dispatch(setHighlighCode({
+            enabled: enabledHighlight,
+            from: fromLine,
+            to: toLine,
+          }))
+          // setUserCode((prev) => ({
+          //   ...prev,
+          //   codeEditor: {
+          //     ...prev.codeEditor,
+          //     highlightCode: {
+          //       ...prev.codeEditor.highlightCode,
+          //       enabled: enabledHighlight,
+          //       from: fromLine,
+          //       to: toLine,
+          //     }, // or just use from/to directly
+          //   },
+          // }));
         } else {
-          setUserCode((prev) => ({
-            ...prev,
-            descriptionEditor: {
-              ...prev.descriptionEditor,
-              highlightDescription: {
-                ...prev.descriptionEditor.highlightDescription,
-                enabled: enabledHighlight,
-                from: fromLine,
-                to: toLine,
-              }, // or just use from/to directly
-            },
+          dispatch(setHighlighDecription({
+            enabled: enabledHighlight,
+            from: fromLine,
+            to: toLine,
           }));
+          // setUserCode((prev) => ({
+          //   ...prev,
+          //   descriptionEditor: {
+          //     ...prev.descriptionEditor,
+          //     highlightDescription: {
+          //       ...prev.descriptionEditor.highlightDescription,
+          //       enabled: enabledHighlight,
+          //       from: fromLine,
+          //       to: toLine,
+          //     }, // or just use from/to directly
+          //   },
+          // }));
         }
         return "Successfully highlighted.";
       }
@@ -563,13 +578,13 @@ const VoicePage: React.FC<VoicePageProps> = () => {
     };
   };
 
-  // useEffect(() => {
-  //   console.log(userCodeModal.codeEditor)
-  // }, [userCodeModal.codeEditor]);
+  useEffect(() => {
+    console.log(localStorage.getItem("coding-editor"))
+  }, [codeEditor]);
 
-  // useEffect(() => {
-  //   console.log(userCodeModal.descriptionEditor)
-  // }, [userCodeModal.descriptionEditor]);
+  useEffect(() => {
+    console.log(localStorage.getItem("description-editor"))
+  }, [descriptionEditor]);
 
   return (
     <div className="flex items-center gap-4">

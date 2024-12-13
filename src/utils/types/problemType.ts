@@ -4,5 +4,5 @@
     title: string;
     problemDescription: string;
     starterCode: string;
-    handlerFunction: ((fn: any) => boolean) | string;
+    // handlerFunction: ((fn: any) => boolean) | string;
   };

@@ -55,5 +55,5 @@ Constraints:
 2. s consists of parentheses only '()[]{}'.
 `,
   starterCode: starterCodeValidParenthesesPython,
-  handlerFunction: validParenthesesHandler,
+  // handlerFunction: validParenthesesHandler,
 };

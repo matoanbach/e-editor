@@ -1,6 +1,6 @@
 import { auth } from "@/firebase/firebase";
 import Link from "next/link";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import Logout from "../Logout/Logout";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
@@ -9,6 +9,9 @@ import Timer from "../Timer/Timer";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/state/store";
 import { handleAuthCallback, loginUser, logoutUser } from "@/state/user/userSlice";
+import { problems } from "@/utils/problems";
+import { setProblem } from "@/state/editor/editorSlice";
+
 
 type TopbarProps = {
 };
@@ -16,12 +19,26 @@ type TopbarProps = {
 const Topbar: React.FC<TopbarProps> = () => {
   // Use auth0 to handle authentication
   const dispatch = useDispatch<AppDispatch>()
+
   const { isAuthenticated, email, picture } = useSelector((state: RootState) => state.userSlice)
+  const [currentProblemIndex, setCurrentProblemIndex] = useState<number>(0)
+  const problemKeys = Object.keys(problems);
 
   const handleLogin = () => {
     dispatch(loginUser())
   }
 
+  const handleNextProblem = () => {
+    setCurrentProblemIndex((prevIndex) => {
+      return prevIndex < problemKeys.length - 1 ? prevIndex + 1 : 0
+    })
+  }
+
+  const handlePreviousProblem = () => {
+    setCurrentProblemIndex((prevIndex) => {
+      return prevIndex > 0 ? prevIndex - 1 : problemKeys.length - 1
+    })
+  }
 
   useEffect(() => {
     if (window.location.search.includes("code=")) {
@@ -29,7 +46,10 @@ const Topbar: React.FC<TopbarProps> = () => {
     }
   }, [dispatch])
 
-
+  useEffect(() => {
+    const problem = problems[problemKeys[currentProblemIndex]];
+    dispatch(setProblem(problem));
+  }, [currentProblemIndex])
   return (
     <nav className="relative flex h-[50px] w-full shrink-0 items-center px-5 bg-dark-layer-1 text-dark-gray-7">
       <div
@@ -41,12 +61,12 @@ const Topbar: React.FC<TopbarProps> = () => {
 
         <div className="flex items-center gap-4 flex-1 justify-center">
           <div
-            className="flex items-center justify-center rounded bg-dark-fill-3 hover:bg-dark-fill-2 h-8 w-8 cursor-pointer"
+            className="flex items-center justify-center rounded bg-dark-fill-3 hover:bg-dark-fill-2 h-8 w-8 cursor-pointer" onClick={handlePreviousProblem}
           >
             <FaChevronLeft />
           </div>
           <div
-            className="flex items-center justify-center rounded bg-dark-fill-3 hover:bg-dark-fill-2 h-8 w-8 cursor-pointer"
+            className="flex items-center justify-center rounded bg-dark-fill-3 hover:bg-dark-fill-2 h-8 w-8 cursor-pointer" onClick={handleNextProblem}
           >
             <FaChevronRight />
           </div>

@@ -1,13 +1,9 @@
 // import CircleSkeleton from "@/components/Skeletons/CircleSkeleton";
 // import RectangleSkeleton from "@/components/Skeletons/RectangleSkeleton";
-import { Problem } from "@/utils/types/problem";
 import CodeMirror from "@uiw/react-codemirror";
-import PreferenceNav from "../Playground/PreferenceNav/PreferenceNav";
 import Split from "react-split";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
-import { html } from "@codemirror/lang-html";
 import { EditorView } from "@codemirror/view";
-import EditorFooter from "@/components/Workspace/Playground/EditorFooter";
 import { useEffect, useRef, useState } from "react";
 import { ISettings } from "../Workspace";
 import { useRecoilState } from "recoil";
@@ -18,28 +14,32 @@ import {
   lineHighlightField,
 } from "@/utils/temp/highlightLines";
 import { ProblemType } from "@/utils/types/problemType";
+import EditorFooter from "../Playground/EditorFooter";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/state/store";
+import { setDescriptionContent } from "@/state/editor/editorSlice";
 
 type ProblemDescriptionProps = {
-  problem: ProblemType;
   settings: ISettings;
 };
 
 const ProblemDescription: React.FC<ProblemDescriptionProps> = ({
-  problem,
   settings,
 }) => {
   const editorViewRef = useRef<EditorView | null>(null);
-  const [userCodeModal, setUserCode] = useRecoilState(userCodeState);
+  // const [userCodeModal, setUserCode] = useRecoilState(userCodeState);
+  const { descriptionEditor, problem } = useSelector((state: RootState) => state.editorSlice)
+  const dispatch = useDispatch<AppDispatch>()
+
 
   const handleDescriptionChange = (newDescription: string) => {
-    setUserCode((prev) => ({
-      ...prev,
-      descriptionEditor: { ...prev.descriptionEditor, content: newDescription },
-    }));
-    localStorage.setItem(
-      "description-editor",
-      userCodeModal.descriptionEditor.content
-    );
+    // setUserCode((prev) => ({
+    //   ...prev,
+    //   descriptionEditor: { ...prev.descriptionEditor, content: newDescription },
+    // }));
+    dispatch(setDescriptionContent(newDescription));
+
+    localStorage.setItem("description-editor", descriptionEditor.content);
   };
 
   const customTheme = EditorView.theme(
@@ -63,7 +63,7 @@ const ProblemDescription: React.FC<ProblemDescriptionProps> = ({
   const highlightLines = (start: number, end: number) => {
     const view = editorViewRef.current;
     if (!view) return;
-    if (userCodeModal.descriptionEditor.highlightDescription.enabled) {
+    if (descriptionEditor.highlightDescription.enabled) {
       view.dispatch({
         effects: addLineHighlightRange.of({ fromLine: start, toLine: end }),
       });
@@ -77,19 +77,15 @@ const ProblemDescription: React.FC<ProblemDescriptionProps> = ({
   useEffect(() => {
     if (editorViewRef.current) {
       highlightLines(
-        userCodeModal.descriptionEditor.highlightDescription.from,
-        userCodeModal.descriptionEditor.highlightDescription.to
+        descriptionEditor.highlightDescription.from,
+        descriptionEditor.highlightDescription.to
       );
     }
-  }, [userCodeModal.descriptionEditor.highlightDescription]);
+  }, [descriptionEditor.highlightDescription]);
 
   useEffect(() => {
-    console.log(settings.textColor)
-  }, [settings.textColor])
-
-  useEffect(() => {
-    handleDescriptionChange(problem.problemDescription)
-  }, [])
+    handleDescriptionChange(problem ? problem.problemDescription : "")
+  }, [problem])
 
   return (
     <div className="flex flex-col bg-dark-layer-1 relative overflow-x-hidden">
@@ -111,7 +107,7 @@ const ProblemDescription: React.FC<ProblemDescriptionProps> = ({
       >
         <div className="w-full overflow-auto">
           <CodeMirror
-            value={userCodeModal.descriptionEditor.content}
+            value={descriptionEditor.content}
             className="cm-outer-container"
             extensions={[customTheme, lineHighlightField]}
             onChange={handleDescriptionChange}

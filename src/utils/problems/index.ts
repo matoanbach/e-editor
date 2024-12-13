@@ -1,4 +1,3 @@
-import { Problem } from "../types/problem";
 import { ProblemType } from "../types/problemType";
 import { jumpGame } from "./jump-game";
 import { reverseLinkedList } from "./reverse-linked-list";

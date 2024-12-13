@@ -51,5 +51,5 @@ Constraints:
 2. 0 <= nums[i] <= 10^5
 `,
   starterCode: starterCodeJumpGamePython,
-  handlerFunction: jumpGameHandler,
+  // handlerFunction: jumpGameHandler,
 };

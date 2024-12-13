@@ -1,43 +1,55 @@
 import Topbar from "@/components/Topbar/Topbar";
-import Workspace from "@/components/Workspace/Workspace";
 import AnotherWorkspace from "@/components/AnotherWorkspace/Workspace";
 import { problems } from "@/utils/problems";
 
-import React from "react";
-import { ProblemType } from "@/utils/types/problemType";
+import React, { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/state/store";
+import { setProblem } from "@/state/editor/editorSlice";
 
 type ProblemPageProps = {
-    problem: ProblemType;
+    // problem: ProblemType
 };
 
-const ProblemPage: React.FC<ProblemPageProps> = ({ problem }) => {
+const ProblemPage: React.FC<ProblemPageProps> = () => {
+    const dispatch = useDispatch<AppDispatch>();
+    useEffect(() => {
+        const pid = "two-sum";
+        const problem = problems[pid];
+        dispatch(setProblem(problem));
+    }, []);
+    // dispatch(setProblem(problem))
     return (
         <>
             <div>
                 <Topbar />
-                {/* <Workspace problem={problem}/> */}
-                <AnotherWorkspace problem={problem} />
+                <AnotherWorkspace />
             </div>
+
         </>
     );
 };
 export default ProblemPage;
 
+// (Optional): generate a random problem before rendering the editor
 
-export async function getStaticProps() {
-    const pid = "two-sum";
-    const problem = problems[pid];
+// export async function getStaticProps() {
+//     const dispatch = useDispatch<AppDispatch>();
 
-    if (!problem) {
-        return {
-            notFound: true,
-        };
-    }
-    problem.handlerFunction = problem.handlerFunction.toString();
+//     const pid = "two-sum";
+//     const problem = problems[pid];
+//     dispatch(setProblem(problem));
 
-    return {
-        props: {
-            problem,
-        },
-    };
-}
+//     if (!problem) {
+//         return {
+//             notFound: true,
+//         };
+//     }
+//     // problem.handlerFunction = problem.handlerFunction.toString();
+
+//     return {
+//         props: {
+//             problem,
+//         },
+//     };
+// }

@@ -7,7 +7,6 @@ import { ProblemType } from "@/utils/types/problemType";
 // import useWindowSize from "@/hooks/useWindowSize";
 
 type WorkspaceProps = {
-  problem: ProblemType;
 };
 
 export interface ISettings {
@@ -19,7 +18,7 @@ export interface ISettings {
   textDropdownIsOpen: boolean;
 }
 
-const Workspace: React.FC<WorkspaceProps> = ({ problem }) => {
+const Workspace: React.FC<WorkspaceProps> = () => {
 
   const [settings, setSettings] = useState<ISettings>({
     codeFontSize: "14px",
@@ -32,10 +31,9 @@ const Workspace: React.FC<WorkspaceProps> = ({ problem }) => {
 
   return (
     <Split className="split" minSize={0}>
-      <ProblemDescription problem={problem} settings={settings} />
+      <ProblemDescription settings={settings} />
       <div className="bg-dark-fill-2">
         <Playground
-          problem={problem}
           settings={settings}
           setSettings={setSettings}
         />

@@ -70,5 +70,5 @@ Constraints:
 - Only one valid answer exists.
   `,
   starterCode: starterCodeTwoSum,
-  handlerFunction: handlerTwoSum,
+  // handlerFunction: handlerTwoSum,
 };

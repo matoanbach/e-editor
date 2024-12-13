@@ -75,5 +75,5 @@ Constraints:
 4. -10^4 <= matrix[i][j], target <= 10^4
 `,
   starterCode: starterCodeSearch2DMatrixPython,
-  handlerFunction: search2DMatrixHandler,
+  // handlerFunction: search2DMatrixHandler,
 };

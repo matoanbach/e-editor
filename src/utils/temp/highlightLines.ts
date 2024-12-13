@@ -1,31 +1,3 @@
-// import { StateEffect, StateField, RangeSetBuilder } from "@codemirror/state";
-// import { Decoration, EditorView } from "@codemirror/view";
-
-// export const addLineHighlight = StateEffect.define<number>();
-
-// const lineHighlightMark = Decoration.line({
-//   attributes: { style: "background-color: yellow" }
-// });
-
-// export const lineHighlightField = StateField.define({
-//   create() {
-//     return Decoration.none;
-//   },
-//   update(decorations, transaction) {
-//     decorations = decorations.map(transaction.changes);
-//     for (let effect of transaction.effects) {
-//       if (effect.is(addLineHighlight)) {
-//         // Clear previous highlights and add the new one
-//         const builder = new RangeSetBuilder<Decoration>();
-//         builder.add(effect.value, effect.value, lineHighlightMark);
-//         decorations = builder.finish();
-//       }
-//     }
-//     return decorations;
-//   },
-//   provide: f => EditorView.decorations.from(f)
-// });
-
 import { StateEffect, StateField, RangeSetBuilder } from "@codemirror/state";
 import { Decoration, EditorView } from "@codemirror/view";
 

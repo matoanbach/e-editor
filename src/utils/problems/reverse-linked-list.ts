@@ -91,5 +91,5 @@ Constraints:
 - -5000 <= Node.val <= 5000.
   `,
   starterCode: starterCodeReverseLinkedList,
-  handlerFunction: reverseLinkedListHandler,
+  // handlerFunction: reverseLinkedListHandler,
 };

@@ -1,4 +1,4 @@
-import { problems } from "@/mockProblems/problems";
+import { problems } from "@/utils/problems/mockProblems/problems";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { AiFillYoutube } from "react-icons/ai";
