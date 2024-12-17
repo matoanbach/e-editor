@@ -1,4 +1,3 @@
-import { auth } from "@/firebase/firebase";
 import { AppDispatch } from "@/state/store";
 import { logoutUser } from "@/state/user/userSlice";
 import React from "react";
@@ -9,7 +8,6 @@ import { useDispatch } from "react-redux";
 type LogoutProps = {};
 
 const Logout: React.FC<LogoutProps> = () => {
-  const [signOut, loading, error] = useSignOut(auth);
   const dispatch = useDispatch<AppDispatch>()
 
   const handleLogout = () => {
