@@ -22,40 +22,49 @@ export default function Home() {
 
   console.log(inputs);
 
+  // return (
+  //   <>
+  //     <main className="bg-dark-layer-2 min-h-screen">
+  //       <Topbar />
+  //       <Link href="/problem">
+  //         Practice
+  //       </Link>
+  //     </main>
+  //   </>
+  // );
   return (
     <>
       <main className="bg-dark-layer-2 min-h-screen">
-        <Topbar />
-        <Link href="/problem">
-          Practice
-        </Link>
-        {/* <h1 className="text-2xl text-center text-gray-700 dark:text-gray-400 font-medium uppercase mt-10 mb-5">
-          &ldquo; QUALITY OVER QUANTITY &rdquo;
-        </h1>
-        <div className="relative overflow-x-auto mx-auto px-6 pb-10">
-          <table className="text-sm text-left text-gray-500 dark:text-gray-400 sm:w-7/12 w-full max-w-[1200px] mx-auto">
-            <thead className="text-xs text-gray-700 uppercase dark:text-gray-400 border-b">
-              <tr>
-                <th scope="col" className="px-1 py-3 w-0 font-medium">
-                  Status
-                </th>
-                <th scope="col" className="px-6 py-3 w-0 font-medium">
-                  Title
-                </th>
-                <th scope="col" className="px-6 py-3 w-0 font-medium">
-                  Difficulty
-                </th>
-                <th scope="col" className="px-6 py-3 w-0 font-medium">
-                  Category
-                </th>
-                <th scope="col" className="px-6 py-3 w-0 font-medium">
-                  Solution
-                </th>
-              </tr>
-            </thead>
-            <ProblemTable />
-          </table>
-        </div> */}
+        <Topbar enabled={false}/>
+        <div className="flex flex-col items-center justify-center p-4">
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-6">
+            Welcome to the Coding Practice Platform
+          </h1>
+          <p className="text-gray-300 text-center max-w-xl mb-8">
+            Practice coding problems, solve challenging LeetCode-style questions, and learn with the help of our integrated AI assistant.
+          </p>
+
+          <Link href="/problem">
+            <button className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition duration-200 mb-10">
+              Get started
+            </button>
+          </Link>
+
+          {/* Optional: YouTube Demo Video */}
+          <div className="w-full max-w-2xl aspect-w-16 aspect-h-9 mb-8">
+            <iframe
+              className="w-full h-full"
+              src="https://www.youtube.com/embed/VIDEO_ID_HERE"
+              title="Demo Video"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
+          </div>
+
+          {/* If you want to show a problem table or something else: */}
+          {/* <ProblemTable /> */}
+        </div>
       </main>
     </>
   );

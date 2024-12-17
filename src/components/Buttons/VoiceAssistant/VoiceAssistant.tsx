@@ -9,14 +9,14 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = () => {
   const [showForm, setShowForm] = useState<boolean>(false);
 
   return (
-    <div className="preferenceBtn group p-0 mr-0">
-      <div className="text-gray-300 mr-4">
-        <div className={`${showForm ? "absolute invisible" : ""}`}>
+    <div className="preferenceBtn group mr-0">
+      <div className="text-gray-300">
+        <div className={`${showForm ? "absolute invisible" : "mr-3"}`}>
           <Voice />
         </div>
       </div>
-      <div className="font-bold text-2xl text-gray-400">
-        <RiVoiceprintLine className="my-2 mr-4" onClick={() => setShowForm(!showForm)} />
+      <div className="font-bold text-2xl text-gray-300 flex items-center">
+        <RiVoiceprintLine onClick={() => setShowForm(!showForm)} />
       </div>
       {showForm && (
         <div className="preferenceBtn-tooltip">Voice Assistance</div>

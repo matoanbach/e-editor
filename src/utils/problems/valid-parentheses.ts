@@ -17,8 +17,7 @@ export const validParenthesesHandler = (fn: any) => {
   }
 };
 
-const starterCodeValidParenthesesPython = `
-def valid_parentheses(s: str) -> bool:
+const starterCodeValidParenthesesPython = `def valid_parentheses(s: str) -> bool:
     # Write your code here
     pass
 `;

@@ -12,7 +12,11 @@
 body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-  height: 100vh;
+    min-height: 100vh; /* Instead of height: 100vh */
+    /* margin: 0; 
+    padding: 0;  */
+     overflow: hidden;  /* Prevent default browser scrollbars */
+  
 }
 
 @layer components {
@@ -42,7 +46,7 @@ body {
 /* CODE EDITOR*/
 .cm-scroller,
 .cm-gutters {
-  background-color: #282828 !important;
+  background-color: #1a1a1a !important;
 }
 .cm-focused {
   outline: none !important;
@@ -54,13 +58,13 @@ body {
 }
 
 .gutter {
-  background-color: rgb(26, 26, 26);
+  background-color: #282828;
   background-repeat: no-repeat;
   background-position: 50%;
 }
-.gutter:hover {
+/* .gutter:hover {
   background-color: #0a84ff;
-}
+} */
 
 .gutter.gutter-horizontal {
   background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==");

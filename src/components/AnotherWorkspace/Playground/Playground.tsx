@@ -3,12 +3,9 @@ import PreferenceNav from "./PreferenceNav/PreferenceNav";
 import CodeMirror, { EditorView } from "@uiw/react-codemirror";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import { ISettings } from "../Workspace";
-import { useRecoilState } from "recoil";
-import { userCodeState } from "@/atoms/userCodeAtom";
 
 // Programming languages for the code editor:
 import { python } from "@codemirror/lang-python";
-import { javascript } from "@codemirror/lang-javascript";
 import {
   addLineHighlightRange,
   clearLineHighlight,
@@ -74,7 +71,7 @@ const Playground: React.FC<PlaygroundProps> = ({
   }, [problem]);
 
   return (
-    <div className="flex flex-col bg-dark-layer-1 relative overflow-x-hidden">
+    <div className="flex flex-col bg-dark-layer-2 relative overflow-x-hidden">
       <PreferenceNav settings={settings} setSettings={setSettings} />
       <div className="h-[calc(100vh-94px)] overflow-y-auto">
         <div className="w-full overflow-auto">
@@ -82,7 +79,7 @@ const Playground: React.FC<PlaygroundProps> = ({
             value={codeEditor.content}
             theme={vscodeDark}
             onChange={handleCodeChange}
-            extensions={[python(), lineHighlightField]}
+            extensions={[python(), lineHighlightField, EditorView.lineWrapping]}
             onCreateEditor={(view) => {
               editorViewRef.current = view;
             }}

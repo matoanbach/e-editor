@@ -2,8 +2,7 @@ import assert from "assert";
 import { ProblemType } from "../types/problemType";
 
 // Starter code in Python
-const starterCodeReverseLinkedList = `
-class ListNode:
+const starterCodeReverseLinkedList = `class ListNode:
     def __init__(self, val=0, next=None):
         self.val = val
         self.next = next

@@ -18,6 +18,10 @@ interface EditorState {
     content: string;
     highlightDescription: HighlightState;
   };
+  compilerOutput: {
+    content: string;
+    loading: boolean;
+  };
 }
 
 const initialState: EditorState = {
@@ -37,6 +41,10 @@ const initialState: EditorState = {
       from: NaN,
       to: NaN,
     },
+  },
+  compilerOutput: {
+    content: "",
+    loading: false,
   },
 };
 
@@ -68,6 +76,12 @@ const editorSlice = createSlice({
       state.codeEditor = initialState.codeEditor;
       state.descriptionEditor = initialState.descriptionEditor;
     },
+    setLoadingCompilerOutput: (state, action: PayloadAction<boolean>) => {
+      state.compilerOutput.loading = action.payload;
+    },
+    setCompilerOutput: (state, action: PayloadAction<string>) => {
+      state.compilerOutput.content = action.payload;
+    },
   },
 });
 
@@ -78,6 +92,8 @@ export const {
   setHighlighCode,
   setHighlighDecription,
   resetEditorState,
+  setCompilerOutput,
+  setLoadingCompilerOutput,
 } = editorSlice.actions;
 
 export default editorSlice.reducer;

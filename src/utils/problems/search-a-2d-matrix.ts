@@ -34,8 +34,7 @@ export const search2DMatrixHandler = (fn: any) => {
   }
 };
 
-const starterCodeSearch2DMatrixPython = `
-def search_matrix(matrix, target):
+const starterCodeSearch2DMatrixPython = `def search_matrix(matrix, target):
     # Write your code here
     pass
 `;

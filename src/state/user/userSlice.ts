@@ -58,14 +58,6 @@ export const handleAuthCallback = createAsyncThunk(
       const user = await auth0.getUser();
       if (!user) throw new Error("User not found");
 
-    //   // Retrieve the stored returnTo URL and clear it
-    //   const returnTo =
-    //     localStorage.getItem("returnTo") || window.location.origin;
-    //   localStorage.removeItem("returnTo");
-
-    //   // Redirect the user back to the saved URL
-    //   window.location.href = returnTo;
-
       return {
         name: user.name || "",
         email: user.email || "",

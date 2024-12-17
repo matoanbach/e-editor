@@ -20,13 +20,10 @@ const ProblemPage: React.FC<ProblemPageProps> = () => {
     }, []);
     // dispatch(setProblem(problem))
     return (
-        <>
             <div>
-                <Topbar />
+                <Topbar enabled={true}/>
                 <AnotherWorkspace />
             </div>
-
-        </>
     );
 };
 export default ProblemPage;

@@ -3,8 +3,6 @@ import { WavRecorder, WavStreamPlayer } from "@/lib/wavtools/index.js";
 import { RealtimeClient } from "@openai/realtime-api-beta";
 import { ItemType } from "@openai/realtime-api-beta/dist/lib/client.js";
 import OpenAI from "openai";
-import { userCodeState } from "@/atoms/userCodeAtom";
-import { useRecoilState } from "recoil";
 import TemporaryToggle from "@/components/Buttons/TemporaryToggle/TemporaryToggle";
 import TemporaryButton from "@/components/Buttons/TemporaryButton/TemporaryButton";
 import APIRequestForm from "@/components/Buttons/APIRequestForm/APIRequestForm";
@@ -385,27 +383,7 @@ const VoicePage: React.FC<VoicePageProps> = () => {
         if (!newCode) {
           return "Failed to update code: No new code provided.";
         }
-        // let oldCode = localStorage.getItem("coding-editor");
-        // if (!oldCode) {
-        //   return "Failed to update code: No old code provided.";
-        // }
-
-        // let tmp = [
-        //   // part of the array before the specified index
-        //   ...oldCode.slice(0, fromLine),
-        //   // inserted items
-        //   ...newCode,
-        //   // part of the array after the specified index
-        //   ...oldCode.slice(fromLine),
-        // ];
-
-        console.log(newCode);
         dispatch(setCodeContent(newCode))
-        // setUserCode((prev) => ({
-        //   ...prev,
-        //   codeEditor: { ...prev.codeEditor, content: newCode },
-        // }));
-        // Update code state
         return "Code successfully updated in the editor.";
       }
     );
@@ -432,13 +410,6 @@ const VoicePage: React.FC<VoicePageProps> = () => {
           return "Failed to update description: No new description provided.";
         }
         dispatch(setDescriptionContent(newDescription));
-        // setUserCode((prev) => ({
-        //   ...prev,
-        //   descriptionEditor: {
-        //     ...prev.descriptionEditor,
-        //     content: newDescription,
-        //   },
-        // })); // Update description state
         return "Description successfully updated in the editor.";
       }
     );
@@ -578,13 +549,13 @@ const VoicePage: React.FC<VoicePageProps> = () => {
     };
   };
 
-  useEffect(() => {
-    console.log(localStorage.getItem("coding-editor"))
-  }, [codeEditor]);
+  // useEffect(() => {
+  //   console.log(localStorage.getItem("coding-editor"))
+  // }, [codeEditor]);
 
-  useEffect(() => {
-    console.log(localStorage.getItem("description-editor"))
-  }, [descriptionEditor]);
+  // useEffect(() => {
+  //   console.log(localStorage.getItem("description-editor"))
+  // }, [descriptionEditor]);
 
   return (
     <div className="flex items-center gap-4">

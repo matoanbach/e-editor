@@ -3,8 +3,6 @@ import { ProblemType } from "../types/problemType";
 
 
 const starterCodeTwoSum = `def two_sum(nums, target):
-  # Write your code here
-  # Write your code here
   # Write your code here`;
 
 // Checks if the user has the correct code
