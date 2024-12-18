@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useState, useEffect } from "react";
+import React, { useRef, useCallback, useState } from "react";
 import { WavRecorder, WavStreamPlayer } from "@/lib/wavtools/index.js";
 import { RealtimeClient } from "@openai/realtime-api-beta";
 import OpenAI from "openai";
@@ -76,7 +76,7 @@ const VoicePage: React.FC = () => {
           },
         ],
       });
-      console.log("API key is valid!");
+      console.log("API key is valid! response: ", response.choices[0].message);
       // setValidAPIKey(true);
 
       clientRef.current = new RealtimeClient({
