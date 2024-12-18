@@ -33,7 +33,6 @@ const ProblemDescription: React.FC<ProblemDescriptionProps> = ({
     //   descriptionEditor: { ...prev.descriptionEditor, content: newDescription },
     // }));
     dispatch(setDescriptionContent(newDescription));
-
     localStorage.setItem("description-editor", descriptionEditor.content);
   };
 
@@ -54,19 +53,47 @@ const ProblemDescription: React.FC<ProblemDescriptionProps> = ({
     { dark: true }
   ); // Set to dark mode if applicable
 
-  // Highlight a range of lines, e.g. from line 1 to 4
   const highlightLines = (start: number, end: number) => {
     const view = editorViewRef.current;
     if (!view) return;
-    if (descriptionEditor.highlightDescription.enabled) {
-      view.dispatch({
-        effects: addLineHighlightRange.of({ fromLine: start, toLine: end }),
-      });
-    } else {
+
+    // Add the line highlight effect
+    view.dispatch({
+      effects: addLineHighlightRange.of({ fromLine: start, toLine: end }),
+    });
+
+    // Automatically clear the highlight after 3 seconds
+    setTimeout(() => {
       view.dispatch({
         effects: clearLineHighlight.of(undefined),
       });
-    }
+    }, 3000); // 3000 ms = 3 seconds
+  };
+  
+  const insertLines = (start: number, end: number | null, newCode: string) => {
+    const view = editorViewRef.current;
+    if (!view) return;
+  
+    // Determine the start and end positions
+    const startPosition = view.state.doc.line(start).from;
+    const endPosition = end ? view.state.doc.line(end).to : startPosition;
+  
+    // Dispatch a transaction for insertion or replacement
+    const transaction = view.state.update({
+      changes: {
+        from: startPosition,
+        to: end ? endPosition : startPosition,
+        insert: newCode + '\n',
+      },
+    });
+  
+    view.dispatch(transaction);
+  
+    // Highlight the new or modified lines
+    const newLines = newCode.split("\n").length;
+    const highlightStart = start;
+    const highlightEnd = end ? start + newLines - 1 : highlightStart + newLines - 1;
+    highlightLines(highlightStart, highlightEnd);
   };
 
   useEffect(() => {
@@ -77,6 +104,12 @@ const ProblemDescription: React.FC<ProblemDescriptionProps> = ({
       );
     }
   }, [descriptionEditor.highlightDescription]);
+
+  useEffect(() => {
+    if (editorViewRef.current) {
+      insertLines(descriptionEditor.changeState.from, descriptionEditor.changeState.to, descriptionEditor.changeState.content)
+    }
+  }, [descriptionEditor.changeState])
 
   useEffect(() => {
     handleDescriptionChange(problem ? problem.problemDescription : "")
@@ -121,7 +154,6 @@ const ProblemDescription: React.FC<ProblemDescriptionProps> = ({
           <Compiler />
         </div>
       </Split>
-      {/* <EditorFooter /> */}
     </div>
   );
 };

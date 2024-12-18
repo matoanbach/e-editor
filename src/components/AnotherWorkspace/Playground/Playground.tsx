@@ -45,15 +45,45 @@ const Playground: React.FC<PlaygroundProps> = ({
   const highlightLines = (start: number, end: number) => {
     const view = editorViewRef.current;
     if (!view) return;
-    if (codeEditor.highlightCode.enabled) {
-      view.dispatch({
-        effects: addLineHighlightRange.of({ fromLine: start, toLine: end }),
-      });
-    } else {
+
+    // Add the line highlight effect
+    view.dispatch({
+      effects: addLineHighlightRange.of({ fromLine: start, toLine: end }),
+    });
+
+    // Automatically clear the highlight after 3 seconds
+    setTimeout(() => {
       view.dispatch({
         effects: clearLineHighlight.of(undefined),
       });
-    }
+    }, 3000); // 3000 ms = 3 seconds
+  };
+
+
+  const insertLines = (start: number, end: number | null, newCode: string) => {
+    const view = editorViewRef.current;
+    if (!view) return;
+  
+    // Determine the start and end positions
+    const startPosition = view.state.doc.line(start).from;
+    const endPosition = end ? view.state.doc.line(end).to : startPosition;
+  
+    // Dispatch a transaction for insertion or replacement
+    const transaction = view.state.update({
+      changes: {
+        from: startPosition,
+        to: end ? endPosition : startPosition,
+        insert: newCode + '\n',
+      },
+    });
+  
+    view.dispatch(transaction);
+  
+    // Highlight the new or modified lines
+    const newLines = newCode.split("\n").length;
+    const highlightStart = start;
+    const highlightEnd = end ? start + newLines - 1 : highlightStart + newLines - 1;
+    highlightLines(highlightStart, highlightEnd);
   };
 
   useEffect(() => {
@@ -64,6 +94,12 @@ const Playground: React.FC<PlaygroundProps> = ({
       );
     }
   }, [codeEditor.highlightCode]);
+
+  useEffect(() => {
+    if (editorViewRef.current) {
+      insertLines(codeEditor.changeState.from, codeEditor.changeState.to, codeEditor.changeState.content)
+    }
+  }, [codeEditor.changeState])
 
   useEffect(() => {
     handleCodeChange(problem ? problem.starterCode : "");

@@ -1,82 +1,15 @@
-import React, { useRef, useCallback, useState } from "react";
+import React, { useRef, useCallback, useState, useEffect } from "react";
 import { WavRecorder, WavStreamPlayer } from "@/lib/wavtools/index.js";
 import { RealtimeClient } from "@openai/realtime-api-beta";
 import OpenAI from "openai";
 import TemporaryToggle from "@/components/Buttons/TemporaryToggle/TemporaryToggle";
 import TemporaryButton from "@/components/Buttons/TemporaryButton/TemporaryButton";
 import APIRequestForm from "@/components/Buttons/APIRequestForm/APIRequestForm";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/state/store";
-import { setCodeContent, setDescriptionContent, setHighlighCode, setHighlighDecription } from "@/state/editor/editorSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/state/store";
+import { insertCode, insertDescription, setHighlighCode, setHighlighDecription } from "@/state/editor/editorSlice";
+import { construct_instructions } from "@/utils/prompts/instructions";
 
-
-const instructions = `
-  System Settings:
-- Tool usage: enabled.
-- Access to the code editor: enabled for reading and editing.
-- Access to the problem description editor: enabled for reading and editing.
-
-Instructions:
-- You are an intelligent assistant designed to help the user interact with their code editor and problem description editor in real-time.
-- Your responsibilities include:
-  1. **Proactively monitoring** the code and description editors to stay updated on changes.
-  2. Fetching the current code or description upon user request.
-  3. Updating the code or description as instructed by the user, ensuring all updates are valid and accurately reflect the request.
-  4. Providing meaningful suggestions or explanations based on the current content in the editors.
-
-Tool Usage:
-1. **read_code**:
-   - Use this tool to fetch and display the current content of the code editor.
-   - Validate that the fetched code is the most recent version.
-   - If the code editor is empty, notify the user that no code is available.
-
-2. **read_description**:
-   - Use this tool to fetch and display the current problem description from the editor.
-   - Validate that the fetched description is the most recent version.
-   - If the description editor is empty, notify the user that no description is available.
-
-3. **change_code**:
-   - Use this tool to replace the existing code in the editor with new code provided by the user or suggested by you.
-   - Validate that the newCode parameter is not empty before attempting to update the editor.
-   - Confirm the update by notifying the user that the code has been successfully updated.
-   - If the update fails, provide a clear and actionable error message.
-
-4. **change_description**:
-   - Use this tool to replace the current problem description in the editor with a new description provided by the user or suggested by you.
-   - Validate that the newDescription parameter is not empty before attempting to update the editor.
-   - Confirm the update by notifying the user that the description has been successfully updated.
-   - If the update fails, provide a clear and actionable error message.
-
-5. **highlight**:
-   - Use this tool to enable or disable highlighting for a specified range of lines in a given editor.
-   - Parameters:
-     - editorType (string): The type of the editor in which to apply the highlighting. Must be either 'description-editor' or 'coding-editor'.
-     - enabledHighlight (boolean): A boolean flag indicating whether to enable (true) or disable (false) the highlighting effect.
-     - fromLine (number): The starting line number to highlight (inclusive).
-     - toLine (number): The ending line number to highlight (inclusive).
-   - Validate that editorType, enabledHighlight, fromLine, and toLine are provided.
-   - If enabledHighlight is true, highlight the specified range of lines. If false, remove any existing highlight.
-   - Confirm the action by notifying the user that the highlight has been successfully updated.
-   - If the operation fails, provide a clear and actionable error message.
-
-Behavior and Personality:
-- Maintain a friendly, courteous, and professional tone at all times.
-- Be proactive in assisting the user by monitoring and understanding the content of the editors.
-- Use concise and conversational language, adapting to the user's needs while ensuring your responses are helpful and accurate.
-- **Speak at a faster pace to maintain an engaging and dynamic interaction.** Avoid unnecessary pauses while delivering information clearly and quickly.
-
-Guidelines for Code and Description Editing:
-- Proactively monitor the editors using the read_code and read_description tools, but avoid making changes unless explicitly requested by the user.
-- When suggesting changes, clearly explain the reasoning and how the new content improves the user’s solution or understanding.
-- Validate all updates made using the change_code or change_description tools to ensure they align with the user’s request and editor state.
-- Encourage user feedback on changes to ensure satisfaction and continued collaboration.
-
-Additional Notes:
-- Regularly validate that the read_code and read_description tools fetch the correct and most recent state of the editors.
-- Avoid making assumptions about the code or description unless explicitly requested by the user.
-- Be open to experimentation and create a collaborative environment where users feel comfortable exploring, asking questions, and modifying content.
-- Foster seamless integration between your assistance and the user’s workflow, ensuring minimal disruption and maximum utility.
-`;
 
 /**
  * Type for all event logs
@@ -97,6 +30,7 @@ const VoicePage: React.FC = () => {
   );
   const clientRef = useRef<RealtimeClient | null>(null);
 
+  const { problem } = useSelector((state: RootState) => state.editorSlice)
   const dispatch = useDispatch<AppDispatch>()
   /**
    * References for
@@ -142,7 +76,6 @@ const VoicePage: React.FC = () => {
           },
         ],
       });
-      console.log(response.choices[0].message.content);
       console.log("API key is valid!");
       // setValidAPIKey(true);
 
@@ -150,8 +83,8 @@ const VoicePage: React.FC = () => {
         apiKey: inputs.apikey,
         dangerouslyAllowAPIKeyInBrowser: true,
       });
-      connectConversation();
       setup();
+      connectConversation();
     } catch (error: any) {
       alert(error.message);
     }
@@ -301,7 +234,7 @@ const VoicePage: React.FC = () => {
     const client = clientRef.current;
 
     // Set instructions
-    client.updateSession({ instructions: instructions });
+    client.updateSession({ instructions: construct_instructions(problem) });
     // Set transcription, otherwise we don't get user transcriptions back
     client.updateSession({ input_audio_transcription: { model: "whisper-1" } });
 
@@ -320,7 +253,8 @@ const VoicePage: React.FC = () => {
         if (!code) {
           return "No code found in the editor.";
         }
-        return code;
+        const codeWithLineNumbers = code.split("\n").map((line, index) => `${index + 1}: ${line}`).join("\n")
+        return codeWithLineNumbers;
       }
     );
 
@@ -339,7 +273,8 @@ const VoicePage: React.FC = () => {
         if (!description) {
           return "No description found in the editor.";
         }
-        return description;
+        const descriptionWithLineNumbers = description.split("\n").map((line, index) => `${index + 1}: ${line}`).join("\n")
+        return descriptionWithLineNumbers;
       }
     );
 
@@ -347,30 +282,47 @@ const VoicePage: React.FC = () => {
     client.addTool(
       {
         name: "change_code",
-        description: "Update the code in the editor with a new version",
+        description: "Replace or insert code in the coding editor",
         parameters: {
           type: "object",
           properties: {
             newCode: {
               type: "string",
+              description: "The new code to insert or replace in the coding editor",
+            },
+            startLine: {
+              type: "number",
+              description: "The starting line number for the operation (inclusive).",
+            },
+            endLine: {
+              type: "number",
               description:
-                "The new code to replace the current code in the editor",
-            }
+                "The ending line number for replacement (inclusive). Optional for insertion.",
+            },
           },
-          required: ["newCode", "fromLine", "toLine"],
+          required: ["newCode", "startLine"],
         },
       },
       async ({
-        newCode
+        newCode,
+        fromLine,
+        toLine,
       }: {
         newCode: string;
         fromLine: number;
-        toLine: number;
+        toLine?: number;
       }) => {
         if (!newCode) {
           return "Failed to update code: No new code provided.";
         }
-        dispatch(setCodeContent(newCode))
+
+        // Update the code in the editor
+        // Update the problem description in the editor
+        dispatch(insertCode({
+          content: newCode,
+          from: fromLine,
+          to: toLine || null,
+        }));
         return "Code successfully updated in the editor.";
       }
     );
@@ -379,7 +331,7 @@ const VoicePage: React.FC = () => {
     client.addTool(
       {
         name: "change_description",
-        description: "Update the problem description in the editor",
+        description: "Replace or insert the problem description in the editor",
         parameters: {
           type: "object",
           properties: {
@@ -388,25 +340,46 @@ const VoicePage: React.FC = () => {
               description:
                 "The new description to replace the current problem description in the editor",
             },
+            fromLine: {
+              type: "number",
+              description: "The starting line number of the change (inclusive).",
+            },
+            toLine: {
+              type: "number",
+              description: "The ending line number of the change (inclusive).",
+            },
           },
-          required: ["newDescription"],
+          required: ["newDescription", "fromLine", "toLine"],
         },
       },
-      async ({ newDescription }: { newDescription: string }) => {
+      async ({
+        newDescription,
+        fromLine,
+        toLine,
+      }: {
+        newDescription: string;
+        fromLine: number;
+        toLine: number;
+      }) => {
         if (!newDescription) {
           return "Failed to update description: No new description provided.";
         }
-        dispatch(setDescriptionContent(newDescription));
+
+        // Update the problem description in the editor
+        dispatch(insertDescription({
+          content: newDescription,
+          from: fromLine,
+          to: toLine || null,
+        }));
         return "Description successfully updated in the editor.";
       }
     );
 
-    // Tool to update the problem description in the editor
+    // Tool to highlight the problem description in the editor
     client.addTool(
       {
         name: "highlight",
-        description:
-          "Highlight a specified range of lines in the given editor.",
+        description: "Highlight a specified range of lines in the given editor.",
         parameters: {
           type: "object",
           properties: {
@@ -414,11 +387,6 @@ const VoicePage: React.FC = () => {
               type: "string",
               description:
                 "The type of editor in which to apply the highlighting. Must be either 'description-editor' or 'coding-editor'.",
-            },
-            enabledHighlight: {
-              type: "boolean",
-              description:
-                "A boolean flag indicating whether to enable or disable the highlighting effect. Set to 'true' to turn on highlighting for the specified range, or 'false' to remove any existing highlights.",
             },
             fromLine: {
               type: "number",
@@ -429,64 +397,43 @@ const VoicePage: React.FC = () => {
               description: "The ending line number to highlight (inclusive).",
             },
           },
-          required: ["editorType", "enabledHighlight", "fromLine", "toLine"],
+          required: ["editorType", "fromLine", "toLine"],
         },
       },
-
       async ({
         editorType,
         fromLine,
         toLine,
-        enabledHighlight,
       }: {
         editorType: string;
         fromLine: number;
         toLine: number;
-        enabledHighlight: boolean;
       }) => {
         if (!editorType) {
-          return "Failed to highlight.";
+          return "Failed to highlight: editor type is missing.";
         }
+
         if (editorType === "coding-editor") {
-          dispatch(setHighlighCode({
-            enabled: enabledHighlight,
-            from: fromLine,
-            to: toLine,
-          }))
-          // setUserCode((prev) => ({
-          //   ...prev,
-          //   codeEditor: {
-          //     ...prev.codeEditor,
-          //     highlightCode: {
-          //       ...prev.codeEditor.highlightCode,
-          //       enabled: enabledHighlight,
-          //       from: fromLine,
-          //       to: toLine,
-          //     }, // or just use from/to directly
-          //   },
-          // }));
+          dispatch(
+            setHighlighCode({
+              from: fromLine,
+              to: toLine,
+            })
+          );
+        } else if (editorType === "description-editor") {
+          dispatch(
+            setHighlighDecription({
+              from: fromLine,
+              to: toLine,
+            })
+          );
         } else {
-          dispatch(setHighlighDecription({
-            enabled: enabledHighlight,
-            from: fromLine,
-            to: toLine,
-          }));
-          // setUserCode((prev) => ({
-          //   ...prev,
-          //   descriptionEditor: {
-          //     ...prev.descriptionEditor,
-          //     highlightDescription: {
-          //       ...prev.descriptionEditor.highlightDescription,
-          //       enabled: enabledHighlight,
-          //       from: fromLine,
-          //       to: toLine,
-          //     }, // or just use from/to directly
-          //   },
-          // }));
+          return "Failed to highlight: unknown editor type.";
         }
         return "Successfully highlighted.";
       }
     );
+
 
     // handle realtime events from client + server for event logging
     // client.on("realtime.event", (realtimeEvent: RealtimeEvent) => {
@@ -538,11 +485,39 @@ const VoicePage: React.FC = () => {
   };
 
   // useEffect(() => {
-  //   console.log(localStorage.getItem("coding-editor"))
+  //   const code = localStorage.getItem("coding-editor");
+
+  //   if (!code) {
+  //     console.log("No code found in localStorage.");
+  //     return;
+  //   }
+
+  //   const lines = code.split("\n"); // Split code into lines
+
+  //   const codeWithLineNumbers = lines
+  //     .map((line, index) => `${index + 1}: ${line}`) // Prepend each line with its line number
+  //     .join("\n"); // Join lines back with newlines
+
+  //   console.log("Code with line numbers:");
+  //   console.log(codeWithLineNumbers);
   // }, [codeEditor]);
 
   // useEffect(() => {
-  //   console.log(localStorage.getItem("description-editor"))
+  //   const description = localStorage.getItem("description-editor")
+
+  //   if (!description) {
+  //     console.log("No code found in localStorage.");
+  //     return;
+  //   }
+
+  //   const lines = description.split("\n"); // Split code into lines
+
+  //   const descriptionWithLineNumbers = lines
+  //     .map((line, index) => `${index + 1}: ${line}`) // Prepend each line with its line number
+  //     .join("\n"); // Join lines back with newlines
+
+  //   console.log("Code with line numbers:");
+  //   console.log(descriptionWithLineNumbers);
   // }, [descriptionEditor]);
 
   return (
