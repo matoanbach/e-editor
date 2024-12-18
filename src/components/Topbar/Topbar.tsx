@@ -189,11 +189,9 @@ const Topbar: React.FC<TopbarProps> = ({ enabled }) => {
         }
         <div className="flex items-center space-x-4 flex-1 justify-end">
           {!isAuthenticated && (
-            // <Link href="/auth">
             <button className="bg-dark-fill-3 py-1 px-2 cursor-pointer rounded select-none" onClick={handleLogin}>
               Sign In
             </button>
-            // </Link>
           )}
 
           {isAuthenticated && (

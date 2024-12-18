@@ -11,6 +11,7 @@
   "dependencies": {
     "@auth0/auth0-react": "^2.2.4",
     "@codemirror/lang-python": "^6.1.6",
+    "@next/bundle-analyzer": "^15.1.1",
     "@openai/realtime-api-beta": "github:openai/openai-realtime-api-beta",
     "@reduxjs/toolkit": "^2.5.0",
     "@uiw/codemirror-theme-vscode": "^4.23.6",
