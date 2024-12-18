@@ -1,16 +1,14 @@
-import React, { useEffect, useRef, useCallback, useState } from "react";
+import React, { useRef, useCallback, useState } from "react";
 import { WavRecorder, WavStreamPlayer } from "@/lib/wavtools/index.js";
 import { RealtimeClient } from "@openai/realtime-api-beta";
-import { ItemType } from "@openai/realtime-api-beta/dist/lib/client.js";
 import OpenAI from "openai";
 import TemporaryToggle from "@/components/Buttons/TemporaryToggle/TemporaryToggle";
 import TemporaryButton from "@/components/Buttons/TemporaryButton/TemporaryButton";
 import APIRequestForm from "@/components/Buttons/APIRequestForm/APIRequestForm";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/state/store";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/state/store";
 import { setCodeContent, setDescriptionContent, setHighlighCode, setHighlighDecription } from "@/state/editor/editorSlice";
 
-type VoicePageProps = {};
 
 const instructions = `
   System Settings:
@@ -83,14 +81,14 @@ Additional Notes:
 /**
  * Type for all event logs
  */
-interface RealtimeEvent {
-  time: string;
-  source: "client" | "server";
-  count?: number;
-  event: { [key: string]: any };
-}
+// interface RealtimeEvent {
+//   time: string;
+//   source: "client" | "server";
+//   count?: number;
+//   event: { [key: string]: any };
+// }
 
-const VoicePage: React.FC<VoicePageProps> = () => {
+const VoicePage: React.FC = () => {
   const wavRecorderRef = useRef<WavRecorder>(
     new WavRecorder({ sampleRate: 24000 })
   );
@@ -99,7 +97,6 @@ const VoicePage: React.FC<VoicePageProps> = () => {
   );
   const clientRef = useRef<RealtimeClient | null>(null);
 
-  const { codeEditor, descriptionEditor, problem } = useSelector((state: RootState) => state.editorSlice)
   const dispatch = useDispatch<AppDispatch>()
   /**
    * References for
@@ -109,17 +106,18 @@ const VoicePage: React.FC<VoicePageProps> = () => {
    */
   const startTimeRef = useRef<string>(new Date().toISOString());
 
-  const [items, setItems] = useState<ItemType[]>([]);
-  const [realtimeEvents, setRealtimeEvents] = useState<RealtimeEvent[]>([]);
-  const [expandedEvents, setExpandedEvents] = useState<{
-    [key: string]: boolean;
-  }>({});
+  // const [items, setItems] = useState<ItemType[]>([]);
+  // const [realtimeEvents, setRealtimeEvents] = useState<RealtimeEvent[]>([]);
+  // const [expandedEvents, setExpandedEvents] = useState<{
+  //   [key: string]: boolean;
+  // }>({});
+
   const [isConnected, setIsConnected] = useState(false);
   const [canPushToTalk, setCanPushToTalk] = useState(true);
   const [isRecording, setIsRecording] = useState(false);
 
   const [inputs, setInputs] = useState({ apikey: "" });
-  const [validAPIKey, setValidAPIKey] = useState<boolean>(false);
+  // const [validAPIKey, setValidAPIKey] = useState<boolean>(false);
 
   /**
    * Promp users for their OPEN API KEY
@@ -146,7 +144,7 @@ const VoicePage: React.FC<VoicePageProps> = () => {
       });
       console.log(response.choices[0].message.content);
       console.log("API key is valid!");
-      setValidAPIKey(true);
+      // setValidAPIKey(true);
 
       clientRef.current = new RealtimeClient({
         apiKey: inputs.apikey,
@@ -155,8 +153,7 @@ const VoicePage: React.FC<VoicePageProps> = () => {
       connectConversation();
       setup();
     } catch (error: any) {
-      alert("Invalid API key. Please try again.");
-      setValidAPIKey(false);
+      alert(error.message);
     }
   };
 
@@ -182,8 +179,8 @@ const VoicePage: React.FC<VoicePageProps> = () => {
     // Set state variables
     startTimeRef.current = new Date().toISOString();
     setIsConnected(true);
-    setRealtimeEvents([]);
-    setItems(client.conversation.getItems());
+    // setRealtimeEvents([]);
+    // setItems(client.conversation.getItems());
 
     // connect to microphone
     await wavRecorder.begin();
@@ -210,12 +207,12 @@ const VoicePage: React.FC<VoicePageProps> = () => {
    */
   const disconnectConversation = useCallback(async () => {
     if (!clientRef.current) return;
-    setValidAPIKey(false);
+    // setValidAPIKey(false);
     setInputs((prev) => ({ ...prev, apikey: "" }));
 
     setIsConnected(false);
-    setRealtimeEvents([]);
-    setItems([]);
+    // setRealtimeEvents([]);
+    // setItems([]);
 
     const client = clientRef.current;
     const wavRecorder = wavRecorderRef.current;
@@ -226,11 +223,11 @@ const VoicePage: React.FC<VoicePageProps> = () => {
     await wavStreamPlayer.interrupt();
   }, []);
 
-  const deleteConversationItem = useCallback(async (id: string) => {
-    if (!clientRef.current) return;
-    const client = clientRef.current;
-    client.deleteItem(id);
-  }, []);
+  // const deleteConversationItem = useCallback(async (id: string) => {
+  //   if (!clientRef.current) return;
+  //   const client = clientRef.current;
+  //   client.deleteItem(id);
+  // }, []);
 
   /**
    * In push-to-talk mode, start recording
@@ -358,23 +355,13 @@ const VoicePage: React.FC<VoicePageProps> = () => {
               type: "string",
               description:
                 "The new code to replace the current code in the editor",
-            },
-            fromLine: {
-              type: "number",
-              description: "The starting line for the new code",
-            },
-            toLine: {
-              type: "number",
-              description: "The ending line for the new code",
-            },
+            }
           },
           required: ["newCode", "fromLine", "toLine"],
         },
       },
       async ({
-        newCode,
-        fromLine,
-        toLine,
+        newCode
       }: {
         newCode: string;
         fromLine: number;
@@ -502,20 +489,20 @@ const VoicePage: React.FC<VoicePageProps> = () => {
     );
 
     // handle realtime events from client + server for event logging
-    client.on("realtime.event", (realtimeEvent: RealtimeEvent) => {
-      setRealtimeEvents((realtimeEvents) => {
-        const lastEvent = realtimeEvents[realtimeEvents.length - 1];
-        if (lastEvent?.event.type === realtimeEvent.event.type) {
-          // if we receive multiple events in a row, aggregate them for display purposes
-          lastEvent.count = (lastEvent.count || 0) + 1;
-          return realtimeEvents.slice(0, -1).concat(lastEvent);
-        } else {
-          return realtimeEvents.concat(realtimeEvent);
-        }
-      });
-    });
+    // client.on("realtime.event", (realtimeEvent: RealtimeEvent) => {
+    //   setRealtimeEvents((realtimeEvents) => {
+    //     const lastEvent = realtimeEvents[realtimeEvents.length - 1];
+    //     if (lastEvent?.event.type === realtimeEvent.event.type) {
+    //       // if we receive multiple events in a row, aggregate them for display purposes
+    //       lastEvent.count = (lastEvent.count || 0) + 1;
+    //       return realtimeEvents.slice(0, -1).concat(lastEvent);
+    //     } else {
+    //       return realtimeEvents.concat(realtimeEvent);
+    //     }
+    //   });
+    // });
 
-    client.on("error", (event: any) => console.error(event));
+    client.on("error", (event: unknown) => console.error(event));
 
     client.on("conversation.interrupted", async () => {
       const trackSampleOffset = await wavStreamPlayer.interrupt();
@@ -525,8 +512,9 @@ const VoicePage: React.FC<VoicePageProps> = () => {
       }
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     client.on("conversation.updated", async ({ item, delta }: any) => {
-      const items = client.conversation.getItems();
+      // const items = client.conversation.getItems();
       if (delta?.audio) {
         wavStreamPlayer.add16BitPCM(delta.audio, item.id);
       }
@@ -538,10 +526,10 @@ const VoicePage: React.FC<VoicePageProps> = () => {
         );
         item.formatted.file = wavFile;
       }
-      setItems(items);
+      // setItems(items);
     });
 
-    setItems(client.conversation.getItems());
+    // setItems(client.conversation.getItems());
 
     return () => {
       // cleanup; resets to defaults

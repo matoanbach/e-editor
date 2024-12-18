@@ -1,41 +1,12 @@
-import ProblemTable from "@/components/ProblemTable/ProblemTable";
 import Topbar from "@/components/Topbar/Topbar";
 import Link from "next/link";
-import { useState } from "react";
 
 export default function Home() {
-  const [inputs, setInputs] = useState({
-    id: "",
-    title: "",
-    difficulty: "",
-    category: "",
-    videoId: "",
-    link: "",
-    order: 0,
-    likes: 0,
-    dislikes: 0,
-  });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputs({ ...inputs, [e.target.name]: e.target.value });
-  };
-
-  console.log(inputs);
-
-  // return (
-  //   <>
-  //     <main className="bg-dark-layer-2 min-h-screen">
-  //       <Topbar />
-  //       <Link href="/problem">
-  //         Practice
-  //       </Link>
-  //     </main>
-  //   </>
-  // );
   return (
     <>
       <main className="bg-dark-layer-2 min-h-screen">
-        <Topbar enabled={false}/>
+        <Topbar enabled={false} />
         <div className="flex flex-col items-center justify-center p-4">
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-6">
             Welcome to the Coding Practice Platform
@@ -61,9 +32,6 @@ export default function Home() {
               allowFullScreen
             ></iframe>
           </div>
-
-          {/* If you want to show a problem table or something else: */}
-          {/* <ProblemTable /> */}
         </div>
       </main>
     </>

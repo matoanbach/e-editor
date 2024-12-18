@@ -1,37 +1,7 @@
-import assert from "assert";
 import { ProblemType } from "../types/problemType";
-
 
 const starterCodeTwoSum = `def two_sum(nums, target):
   # Write your code here`;
-
-// Checks if the user has the correct code
-const handlerTwoSum = (fn: any) => {
-  try {
-    const nums = [
-      [2, 7, 11, 15],
-      [3, 2, 4],
-      [3, 3],
-    ];
-
-    const targets = [9, 6, 6];
-    const answers = [
-      [0, 1],
-      [1, 2],
-      [0, 1],
-    ];
-
-    // Loop through all tests to check if the user's code is correct
-    for (let i = 0; i < nums.length; i++) {
-      const result = fn(nums[i], targets[i]);
-      assert.deepStrictEqual(result, answers[i]);
-    }
-    return true;
-  } catch (error: any) {
-    console.log("twoSum handler function error");
-    throw new Error(error);
-  }
-};
 
 // Merged problemDescription field without HTML
 export const twoSum: ProblemType = {
@@ -68,5 +38,4 @@ Constraints:
 - Only one valid answer exists.
   `,
   starterCode: starterCodeTwoSum,
-  // handlerFunction: handlerTwoSum,
 };

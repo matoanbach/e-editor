@@ -1,13 +1,11 @@
 import { AppDispatch } from "@/state/store";
 import { logoutUser } from "@/state/user/userSlice";
 import React from "react";
-import { useSignOut } from "react-firebase-hooks/auth";
 import { FiLogOut } from "react-icons/fi";
 import { useDispatch } from "react-redux";
 
-type LogoutProps = {};
 
-const Logout: React.FC<LogoutProps> = () => {
+const Logout: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>()
 
   const handleLogout = () => {

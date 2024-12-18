@@ -1,5 +1,3 @@
-// import CircleSkeleton from "@/components/Skeletons/CircleSkeleton";
-// import RectangleSkeleton from "@/components/Skeletons/RectangleSkeleton";
 import CodeMirror from "@uiw/react-codemirror";
 import Split from "react-split";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";

@@ -1,6 +1,5 @@
 import React from "react";
 import { FaRegQuestionCircle } from "react-icons/fa";
-import { VscNewline } from "react-icons/vsc";
 
 type APIRequestFormProps = {
   handleChange:  (e: React.ChangeEvent<HTMLInputElement>) => void;

@@ -6,7 +6,7 @@ import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { FaPlay } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/state/store";
-import { handleAuthCallback, loginUser, logoutUser } from "@/state/user/userSlice";
+import { handleAuthCallback, loginUser } from "@/state/user/userSlice";
 import { problems } from "@/utils/problems";
 import { setCompilerOutput, setLoadingCompilerOutput, setProblem } from "@/state/editor/editorSlice";
 
@@ -15,12 +15,12 @@ type TopbarProps = {
   enabled: boolean
 };
 
-// Replace with your actual tokens
-const AUTHN_HEADER = process.env.NEXT_PUBLIC_AUTHN_HEADER;
-const AUTHN_TOKEN = process.env.NEXT_PUBLIC_AUTHN_TOKEN;
-const AUTHZ_HEADER = process.env.NEXT_PUBLIC_AUTHZ_HEADER;
-const AUTHZ_TOKEN = process.env.NEXT_PUBLIC_AUTHZ_TOKEN;
-const JUDGE0_URL = process.env.NEXT_PUBLIC_JUDGE0_URL;
+// Environment variables
+const AUTHN_HEADER = process.env.NEXT_PUBLIC_AUTHN_HEADER || "X-Auth-Token";
+const AUTHN_TOKEN = process.env.NEXT_PUBLIC_AUTHN_TOKEN || "";
+const AUTHZ_HEADER = process.env.NEXT_PUBLIC_AUTHZ_HEADER || "X-Auth-User";
+const AUTHZ_TOKEN = process.env.NEXT_PUBLIC_AUTHZ_TOKEN || "";
+const JUDGE0_URL = process.env.NEXT_PUBLIC_JUDGE0_URL || "";
 
 const Topbar: React.FC<TopbarProps> = ({ enabled }) => {
   // Use auth0 to handle authentication
@@ -130,8 +130,8 @@ const Topbar: React.FC<TopbarProps> = ({ enabled }) => {
         dispatch(setCompilerOutput("Result not received in a timely manner."));
       }
     } catch (error: any) {
-      console.error("Error:", error);
-      dispatch(setCompilerOutput(`Error: ${error.message}`));
+      alert(error.message);
+      dispatch(setCompilerOutput(`Error: ${error}`));
     } finally {
       dispatch(setLoadingCompilerOutput(false));
     }

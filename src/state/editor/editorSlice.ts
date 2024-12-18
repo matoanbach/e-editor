@@ -1,4 +1,3 @@
-import { problems } from "@/utils/problems";
 import { ProblemType } from "@/utils/types/problemType";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
@@ -53,9 +52,6 @@ const editorSlice = createSlice({
   initialState,
   reducers: {
     setProblem: (state, action: PayloadAction<ProblemType>) => {
-      // state.codeEditor = initialState.codeEditor;
-      // state.descriptionEditor = initialState.descriptionEditor;
-      // console.log("called: ", action.payload);
       state.problem = action.payload;
       state.codeEditor.content = action.payload.starterCode;
       state.descriptionEditor.content = action.payload.problemDescription;

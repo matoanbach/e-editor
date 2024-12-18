@@ -2,12 +2,7 @@ import { useState } from "react";
 import Split from "react-split";
 import ProblemDescription from "./ProblemDescription/ProblemDescription";
 import Playground from "./Playground/Playground";
-import Confetti from "react-confetti";
-import { ProblemType } from "@/utils/types/problemType";
-// import useWindowSize from "@/hooks/useWindowSize";
 
-type WorkspaceProps = {
-};
 
 export interface ISettings {
   codeFontSize: string;
@@ -18,7 +13,7 @@ export interface ISettings {
   textDropdownIsOpen: boolean;
 }
 
-const Workspace: React.FC<WorkspaceProps> = () => {
+const Workspace: React.FC = () => {
 
   const [settings, setSettings] = useState<ISettings>({
     codeFontSize: "14px",
@@ -37,7 +32,6 @@ const Workspace: React.FC<WorkspaceProps> = () => {
           settings={settings}
           setSettings={setSettings}
         />
-        {/* {success && <Confetti gravity={0.3} tweenDuration={4000} width={width - 1} height={height - 1} />} */}
       </div>
     </Split>
   );

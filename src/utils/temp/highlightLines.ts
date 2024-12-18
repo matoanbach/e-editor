@@ -21,10 +21,10 @@ export const lineHighlightField = StateField.define({
   },
   update(decorations, transaction) {
     decorations = decorations.map(transaction.changes);
-    for (let effect of transaction.effects) {
+    for (const effect of transaction.effects) {
       if (effect.is(addLineHighlightRange)) {
         // Clear previous highlights
-        let builder = new RangeSetBuilder<Decoration>();
+        const builder = new RangeSetBuilder<Decoration>();
 
         let { fromLine, toLine } = effect.value;
         // Ensure lines are within document bounds
@@ -34,7 +34,7 @@ export const lineHighlightField = StateField.define({
 
         // Add a line decoration for each line in the range
         for (let lineNo = fromLine; lineNo <= toLine; lineNo++) {
-          let line = doc.line(lineNo);
+          const line = doc.line(lineNo);
           builder.add(line.from, line.from, lineHighlightMark);
         }
         decorations = builder.finish();

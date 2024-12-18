@@ -11,7 +11,6 @@ import {
   clearLineHighlight,
   lineHighlightField,
 } from "@/utils/temp/highlightLines";
-import { ProblemType } from "@/utils/types/problemType";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/state/store";
 import { setCodeContent } from "@/state/editor/editorSlice";

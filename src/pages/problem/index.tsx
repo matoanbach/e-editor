@@ -7,18 +7,16 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/state/store";
 import { setProblem } from "@/state/editor/editorSlice";
 
-type ProblemPageProps = {
-    // problem: ProblemType
-};
 
-const ProblemPage: React.FC<ProblemPageProps> = () => {
+
+const ProblemPage: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
     useEffect(() => {
         const pid = "two-sum";
         const problem = problems[pid];
         dispatch(setProblem(problem));
     }, []);
-    // dispatch(setProblem(problem))
+
     return (
             <div>
                 <Topbar enabled={true}/>

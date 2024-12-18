@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import { RiVoiceprintLine } from "react-icons/ri";
-import OpenAI from "openai";
 import Voice from "../Voice/Voice";
 
-type VoiceAssistantProps = {};
 
-const VoiceAssistant: React.FC<VoiceAssistantProps> = () => {
+const VoiceAssistant: React.FC = () => {
   const [showForm, setShowForm] = useState<boolean>(false);
 
   return (
